@@ -1,0 +1,122 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|c:\\users\\dell\\source\\repos\\kartkitabch\\kartkitabch\\models\\report.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|solutionrelative:kartkitabch\\models\\report.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|c:\\users\\dell\\source\\repos\\kartkitabch\\kartkitabch\\models\\company.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|solutionrelative:kartkitabch\\models\\company.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|c:\\users\\dell\\source\\repos\\kartkitabch\\kartkitabch\\models\\person.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|solutionrelative:kartkitabch\\models\\person.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|c:\\users\\dell\\source\\repos\\kartkitabch\\kartkitabch\\models\\vehicle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|solutionrelative:kartkitabch\\models\\vehicle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|c:\\users\\dell\\source\\repos\\kartkitabch\\kartkitabch\\models\\companylocation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|solutionrelative:kartkitabch\\models\\companylocation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|c:\\users\\dell\\source\\repos\\kartkitabch\\kartkitabch\\models\\provinces.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4FC6130-A59E-5566-5076-C9939265472D}|KartKitabch\\KartKitabch.csproj|solutionrelative:kartkitabch\\models\\provinces.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Report.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\Report.cs",
+              "RelativeDocumentMoniker": "KartKitabch\\Models\\Report.cs",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\Report.cs",
+              "RelativeToolTip": "KartKitabch\\Models\\Report.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAmwBIAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-03T18:44:11.569Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Person.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\Person.cs",
+              "RelativeDocumentMoniker": "KartKitabch\\Models\\Person.cs",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\Person.cs",
+              "RelativeToolTip": "KartKitabch\\Models\\Person.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-03T18:42:33.454Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "vehicle.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\vehicle.cs",
+              "RelativeDocumentMoniker": "KartKitabch\\Models\\vehicle.cs",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\vehicle.cs",
+              "RelativeToolTip": "KartKitabch\\Models\\vehicle.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-03T18:41:20.905Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CompanyLocation.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\CompanyLocation.cs",
+              "RelativeDocumentMoniker": "KartKitabch\\Models\\CompanyLocation.cs",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\CompanyLocation.cs",
+              "RelativeToolTip": "KartKitabch\\Models\\CompanyLocation.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-03T18:38:47.169Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Provinces.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\Provinces.cs",
+              "RelativeDocumentMoniker": "KartKitabch\\Models\\Provinces.cs",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\Provinces.cs",
+              "RelativeToolTip": "KartKitabch\\Models\\Provinces.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-03T18:31:24.133Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Company.cs",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\Company.cs",
+              "RelativeDocumentMoniker": "KartKitabch\\Models\\Company.cs",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\KartKitabch\\KartKitabch\\Models\\Company.cs",
+              "RelativeToolTip": "KartKitabch\\Models\\Company.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-03T18:21:06.75Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
