@@ -18,7 +18,7 @@
     }
     public enum CompanyTon
     {
-        Medium,
-        Big,
+        MediumTon,
+        BigTon,
     }
 }
