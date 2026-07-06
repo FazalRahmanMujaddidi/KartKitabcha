@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KartKitabch.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260704190415_Init")]
-    partial class Init
+    [Migration("20260706141110_AddCompanyLocation")]
+    partial class AddCompanyLocation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,7 +67,7 @@ namespace KartKitabch.Migrations
 
                     b.HasIndex("ProvincesAndCitiesId");
 
-                    b.ToTable("CompanyLocation");
+                    b.ToTable("CompanyLocations");
                 });
 
             modelBuilder.Entity("KartKitabch.Models.ProvincesAndCities", b =>

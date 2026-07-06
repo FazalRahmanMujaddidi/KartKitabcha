@@ -4,7 +4,7 @@ using Microsoft.Identity.Web;
 using Microsoft.EntityFrameworkCore;
 using KartKitabch.Models;
 using KartKitabch.Data; // ✅ IMPORTANT (for AppDbContext)
-
+using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,8 +17,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 
-// Controllers
-builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 
 // OpenAPI
 builder.Services.AddOpenApi();
@@ -42,7 +46,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-
+app.UseRouting();
 app.UseCors("AllowAll"); // ✅ MUST BE HERE
 
 app.UseAuthentication();

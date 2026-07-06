@@ -33,7 +33,26 @@ export default function Header() {
                 Companies
               </NavLink>
             </li>
-
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/provinces">
+                Province
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/company-location">
+                Company Locations
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/vehicle">
+                Vehicle
+              </NavLink>
+            </li>
+                        <li className="nav-item">
+              <NavLink className="nav-link" to="/report">
+                Report
+              </NavLink>
+            </li>
           </ul>
         </div>
 

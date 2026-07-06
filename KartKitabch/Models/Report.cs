@@ -8,33 +8,33 @@
         public string SerialNumber { get; set; }
         public string PaletNumber { get; set; }
         public int ProvincesAndCitiesId { get; set; }
-        public ProvincesAndCities ProvincesAndCities { get; set; }
+        public ProvincesAndCities? ProvincesAndCities { get; set; }
         public KartDuration KartDuration { get; set; }
         public TypeOfKart TypeOfKart { get; set; }
-        public TypeOfActivity TypeOfActivity { get; set; }
-        public KartNewRenewLost KartNewRenewLost { get; set; }
+        public TypeOfActivity? TypeOfActivity { get; set; }
+        public KartNewRenewLost? KartNewRenewLost { get; set; }
         public string? Chasis { get; set; }
 
     }
     public enum KartDuration
     {
-        One,
-        Three,
+        One=1,
+        Three=2,
     }
     public enum TypeOfKart
     {
-        Grand,
-        Simple,
+        Grand=1,
+        Simple=2,
     }
     public enum TypeOfActivity
     {
-        OutCity,
-        InsideCity,
+        OutCity=1,
+        InsideCity=2,
     }
     public enum KartNewRenewLost
     {
-        New,
-        Renew,
-        Lost
+        New=1,
+        Renew=2,
+        Lost=3
     }
 }

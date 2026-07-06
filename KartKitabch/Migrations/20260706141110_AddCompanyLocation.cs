@@ -5,7 +5,7 @@
 namespace KartKitabch.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class AddCompanyLocation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,7 +39,7 @@ namespace KartKitabch.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CompanyLocation",
+                name: "CompanyLocations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -49,15 +49,15 @@ namespace KartKitabch.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CompanyLocation", x => x.Id);
+                    table.PrimaryKey("PK_CompanyLocations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CompanyLocation_Companies_CompanyId",
+                        name: "FK_CompanyLocations_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CompanyLocation_ProvincesAndCities_ProvincesAndCitiesId",
+                        name: "FK_CompanyLocations_ProvincesAndCities_ProvincesAndCitiesId",
                         column: x => x.ProvincesAndCitiesId,
                         principalTable: "ProvincesAndCities",
                         principalColumn: "Id",
@@ -98,13 +98,13 @@ namespace KartKitabch.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompanyLocation_CompanyId",
-                table: "CompanyLocation",
+                name: "IX_CompanyLocations_CompanyId",
+                table: "CompanyLocations",
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompanyLocation_ProvincesAndCitiesId",
-                table: "CompanyLocation",
+                name: "IX_CompanyLocations_ProvincesAndCitiesId",
+                table: "CompanyLocations",
                 column: "ProvincesAndCitiesId");
 
             migrationBuilder.CreateIndex(
@@ -122,7 +122,7 @@ namespace KartKitabch.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CompanyLocation");
+                name: "CompanyLocations");
 
             migrationBuilder.DropTable(
                 name: "Report");

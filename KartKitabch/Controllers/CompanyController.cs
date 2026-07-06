@@ -39,7 +39,33 @@ namespace KartKitabch.Controllers
 
             return company;
         }
+[HttpGet("enums/company-type")]
+public IActionResult GetCompanyTypes()
+{
+    var values = Enum.GetValues(typeof(CompanyType))
+        .Cast<CompanyType>()
+        .Select(x => new
+        {
+            id = (int)x,
+            name = x.ToString()
+        });
 
+    return Ok(values);
+}
+
+[HttpGet("enums/company-ton")]
+public IActionResult GetCompanyTons()
+{
+    var values = Enum.GetValues(typeof(CompanyTon))
+        .Cast<CompanyTon>()
+        .Select(x => new
+        {
+            id = (int)x,
+            name = x.ToString()
+        });
+
+    return Ok(values);
+}
         // ✅ POST: api/company
         [HttpPost]
         public async Task<ActionResult<Company>> Create(Company company)
@@ -78,7 +104,34 @@ namespace KartKitabch.Controllers
 
             return NoContent();
         }
+// GET BY ID (DETAIL)
+[HttpGet("details/{id}")]
+public async Task<IActionResult> Details(int id)
+{
+    var company = await _context.Companies
+        .Where(c => c.Id == id)
+        .Select(c => new
+        {
+            c.Id,
+            c.Name,
+            MyProperty = c.MyProperty.ToString(),
+            CompanyTon = c.CompanyTon.ToString(),
 
+            Locations = c.CompanyLocations.Select(l => new
+            {
+                l.Id,
+                CompanyId = l.CompanyId,
+                CityId = l.ProvincesAndCitiesId,
+                CityName = l.ProvincesAndCities.Name
+            }).ToList()
+        })
+        .FirstOrDefaultAsync();
+
+    if (company == null)
+        return NotFound();
+
+    return Ok(company);
+}
         // ✅ DELETE: api/company/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

@@ -1,0 +1,321 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+
+const API_URL = "http://localhost:5256/api/report";
+const COMPANY_API = "http://localhost:5256/api/company";
+const CITY_API = "http://localhost:5256/api/ProvincesAndCities";
+
+const ENUM_DURATION = `${API_URL}/enums/kart-duration`;
+const ENUM_KART = `${API_URL}/enums/type-of-kart`;
+const ENUM_ACTIVITY = `${API_URL}/enums/type-of-activity`;
+const ENUM_STATUS = `${API_URL}/enums/kart-status`;
+
+export default function ReportPage() {
+  const [reports, setReports] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  const [durations, setDurations] = useState([]);
+  const [kartTypes, setKartTypes] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+
+  const [isEdit, setIsEdit] = useState(false);
+
+  const [form, setForm] = useState({
+    id: 0,
+    companyId: 0,
+    serialNumber: "",
+    paletNumber: "",
+    provincesAndCitiesId: 0,
+    kartDuration: 0,
+    typeOfKart: 0,
+    typeOfActivity: 0,
+    kartNewRenewLost: 0,
+    chasis: ""
+  });
+
+  // ---------------- FETCH ----------------
+  const fetchReports = async () => {
+    try {
+      const res = await axios.get(API_URL);
+      setReports(res.data);
+    } catch {
+      toast.error("Failed to load reports");
+    }
+  };
+
+  const fetchDropdowns = async () => {
+    const [c, city, d, k, a, s] = await Promise.all([
+      axios.get(COMPANY_API),
+      axios.get(CITY_API),
+      axios.get(ENUM_DURATION),
+      axios.get(ENUM_KART),
+      axios.get(ENUM_ACTIVITY),
+      axios.get(ENUM_STATUS),
+    ]);
+
+    setCompanies(c.data);
+    setCities(city.data);
+    setDurations(d.data);
+    setKartTypes(k.data);
+    setActivities(a.data);
+    setStatuses(s.data);
+  };
+
+  useEffect(() => {
+    fetchReports();
+    fetchDropdowns();
+  }, []);
+
+  // ---------------- HANDLE ----------------
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setForm((prev) => ({
+    ...prev,
+    [name]:
+      value === "" ? null : isNaN(value) ? value : Number(value),
+  }));
+};
+
+  // ---------------- CREATE ----------------
+  const create = async () => {
+    try {
+      await axios.post(API_URL, form);
+      toast.success("Report created");
+
+      fetchReports();
+      reset();
+    } catch {
+      toast.error("Create failed");
+    }
+  };
+
+  // ---------------- UPDATE ----------------
+  const update = async () => {
+    try {
+      await axios.put(`${API_URL}/${form.id}`, form);
+      toast.success("Report updated");
+
+      fetchReports();
+      reset();
+    } catch {
+      toast.error("Update failed");
+    }
+  };
+
+  // ---------------- DELETE ----------------
+  const remove = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      toast.success("Deleted");
+
+      fetchReports();
+    } catch {
+      toast.error("Delete failed");
+    }
+  };
+
+  // ---------------- EDIT ----------------
+  const edit = (r) => {
+    setForm(r);
+    setIsEdit(true);
+  };
+
+  const reset = () => {
+    setForm({
+      id: 0,
+      companyId: 0,
+      serialNumber: "",
+      paletNumber: "",
+      provincesAndCitiesId: 0,
+      kartDuration: 0,
+      typeOfKart: 0,
+      typeOfActivity: 0,
+      kartNewRenewLost: 0,
+      chasis: ""
+    });
+
+    setIsEdit(false);
+  };
+
+  // ---------------- UI ----------------
+  return (
+    <div className="container mt-4">
+
+      <h2 className="text-primary mb-4">
+        📄 Report Management
+      </h2>
+
+      {/* FORM */}
+      <div className="card shadow-sm p-3 mb-4">
+        <div className="row g-2">
+
+          {/* COMPANY */}
+          <div className="col-md-3">
+            <select
+              className="form-select"
+              name="companyId"
+              value={form.companyId}
+              onChange={handleChange}
+            >
+              <option value={0}>Select Company</option>
+              {companies.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* CITY */}
+          <div className="col-md-3">
+            <select
+              className="form-select"
+              name="provincesAndCitiesId"
+              value={form.provincesAndCitiesId}
+              onChange={handleChange}
+            >
+              <option value={0}>Select City</option>
+              {cities.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-md-3">
+            <input
+              className="form-control"
+              name="serialNumber"
+              placeholder="Serial Number"
+              value={form.serialNumber}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-3">
+            <input
+              className="form-control"
+              name="paletNumber"
+              placeholder="Palet Number"
+              value={form.paletNumber}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-3">
+            <input
+              className="form-control"
+              name="chasis"
+              placeholder="Chasis"
+              value={form.chasis}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* ENUMS */}
+          <div className="col-md-3">
+            <select className="form-select" name="kartDuration" value={form.kartDuration} onChange={handleChange}>
+              <option value={0}>Duration</option>
+              {durations.map(x => (
+                <option key={x.id} value={x.id}>{x.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-md-3">
+            <select className="form-select" name="typeOfKart" value={form.typeOfKart} onChange={handleChange}>
+              <option value={0}>Type Kart</option>
+              {kartTypes.map(x => (
+                <option key={x.id} value={x.id}>{x.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-md-3">
+            <select className="form-select" name="typeOfActivity" value={form.typeOfActivity} onChange={handleChange}>
+              <option value={0}>Activity</option>
+              {activities.map(x => (
+                <option key={x.id} value={x.id}>{x.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-md-3">
+            <select className="form-select" name="kartNewRenewLost" value={form.kartNewRenewLost} onChange={handleChange}>
+              <option value={0}>Status</option>
+              {statuses.map(x => (
+                <option key={x.id} value={x.id}>{x.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-md-3 d-grid">
+            {isEdit ? (
+              <button className="btn btn-warning" onClick={update}>
+                Update
+              </button>
+            ) : (
+              <button className="btn btn-success" onClick={create}>
+                Create
+              </button>
+            )}
+          </div>
+
+          <div className="col-md-3 d-grid">
+            <button className="btn btn-secondary" onClick={reset}>
+              Reset
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      {/* TABLE */}
+      <div className="card shadow-sm">
+        <div className="card-body">
+
+          <table className="table table-bordered table-hover">
+            <thead className="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Company</th>
+                <th>City</th>
+                <th>Serial</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {reports.map(r => (
+                <tr key={r.id}>
+                  <td>{r.id}</td>
+                  <td>{r.company?.name}</td>
+                  <td>{r.provincesAndCities?.name}</td>
+                  <td>{r.serialNumber}</td>
+
+                  <td>
+                    <button className="btn btn-primary btn-sm me-2" onClick={() => edit(r)}>
+                      Edit
+                    </button>
+
+                    <button className="btn btn-danger btn-sm" onClick={() => remove(r.id)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+  );
+}
