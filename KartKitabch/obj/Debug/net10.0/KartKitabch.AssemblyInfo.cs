@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KartKitabch")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b68da5870f52f912eb4605250bbf69c8f4a4a5ef")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+490f0e95741c869e5c2b4271bcd0a554ba549b88")]
 [assembly: System.Reflection.AssemblyProductAttribute("KartKitabch")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KartKitabch")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -309,12 +309,13 @@ export default function CompanyPage() {
                           <div className="card-body">
 
                             <div className="fw-bold text-primary mb-2">
-                              📍 {l.cityName}
+                              📍🚕 {l.cityName}
                             </div>
 
                             <div className="small text-muted">
-                              <div>Location ID: {l.id}</div>
-                              <div>City ID: {l.provincesAndCitiesId}</div>
+                              <div className="text-success fw-bold">
+                                 Destination: {l.destinationCount}
+                              </div>
                             </div>
 
                           </div>

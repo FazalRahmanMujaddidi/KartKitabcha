@@ -105,6 +105,33 @@ public IActionResult GetCompanyTons()
             return NoContent();
         }
 // GET BY ID (DETAIL)
+// [HttpGet("details/{id}")]
+// public async Task<IActionResult> Details(int id)
+// {
+//     var company = await _context.Companies
+//         .Where(c => c.Id == id)
+//         .Select(c => new
+//         {
+//             c.Id,
+//             c.Name,
+//             MyProperty = c.MyProperty.ToString(),
+//             CompanyTon = c.CompanyTon.ToString(),
+
+//             Locations = c.CompanyLocations.Select(l => new
+//             {
+//                 l.Id,
+//                 CompanyId = l.CompanyId,
+//                 CityId = l.ProvincesAndCitiesId,
+//                 CityName = l.ProvincesAndCities.Name
+//             }).ToList()
+//         })
+//         .FirstOrDefaultAsync();
+
+//     if (company == null)
+//         return NotFound();
+
+//     return Ok(company);
+// }
 [HttpGet("details/{id}")]
 public async Task<IActionResult> Details(int id)
 {
@@ -121,14 +148,26 @@ public async Task<IActionResult> Details(int id)
             {
                 l.Id,
                 CompanyId = l.CompanyId,
+
                 CityId = l.ProvincesAndCitiesId,
-                CityName = l.ProvincesAndCities.Name
+
+                CityName = l.ProvincesAndCities.Name,
+
+
+                // تعداد Report هایی که مقصد آنها این شهر است
+                DestinationCount = _context.Report.Count(r =>
+                    r.CompanyId == c.Id &&
+                    r.DestinationProvinceId == l.ProvincesAndCitiesId
+                )
+
             }).ToList()
         })
         .FirstOrDefaultAsync();
 
+
     if (company == null)
         return NotFound();
+
 
     return Ok(company);
 }
@@ -146,5 +185,19 @@ public async Task<IActionResult> Details(int id)
 
             return NoContent();
         }
+        [HttpGet("{companyId}/locations")]
+public async Task<IActionResult> GetCompanyLocations(int companyId)
+{
+    var cities = await _context.CompanyLocations
+        .Where(x => x.CompanyId == companyId)
+        .Select(x => new
+        {
+            id = x.ProvincesAndCitiesId,
+            name = x.ProvincesAndCities.Name
+        })
+        .ToListAsync();
+
+    return Ok(cities);
+}
     }
 }

@@ -42,15 +42,32 @@ namespace KartKitabch.Controllers
         }
 
         // CREATE
-        [HttpPost]
-        public async Task<IActionResult> Create(Report report)
-        {
-            _context.Report.Add(report);
-            await _context.SaveChangesAsync();
+        // [HttpPost]
+        // public async Task<IActionResult> Create(Report report)
+        // {
+        //     _context.Report.Add(report);
+        //     await _context.SaveChangesAsync();
 
-            return Ok(report);
-        }
+        //     return Ok(report);
+        // }
+[HttpPost]
+public async Task<IActionResult> Create([FromBody] Report report)
+{
+    if (!ModelState.IsValid)
+        return BadRequest(ModelState);
 
+
+    report.Company = null;
+    report.ProvincesAndCities = null;
+    report.DestinationProvince = null;
+
+
+    _context.Report.Add(report);
+
+    await _context.SaveChangesAsync();
+
+    return Ok(report);
+}
         // UPDATE
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, Report report)
@@ -124,6 +141,20 @@ public IActionResult GetKartStatus()
     return Ok(Enum.GetValues(typeof(KartNewRenewLost))
         .Cast<KartNewRenewLost>()
         .Select(x => new { id = (int)x, name = x.ToString() }));
+}
+[HttpGet("{companyId}/locations")]
+public async Task<IActionResult> GetCompanyLocations(int companyId)
+{
+    var cities = await _context.CompanyLocations
+        .Where(x => x.CompanyId == companyId)
+        .Select(x => new
+        {
+            id = x.ProvincesAndCitiesId,
+            name = x.ProvincesAndCities.Name
+        })
+        .ToListAsync();
+
+    return Ok(cities);
 }
 }
 }

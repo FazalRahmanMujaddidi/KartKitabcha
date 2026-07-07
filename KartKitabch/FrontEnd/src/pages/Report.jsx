@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import DatePickerModule from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
+const DatePicker = DatePickerModule.default;
 const API_URL = "http://localhost:5256/api/report";
 const COMPANY_API = "http://localhost:5256/api/company";
 const CITY_API = "http://localhost:5256/api/ProvincesAndCities";
@@ -20,7 +24,7 @@ export default function ReportPage() {
   const [kartTypes, setKartTypes] = useState([]);
   const [activities, setActivities] = useState([]);
   const [statuses, setStatuses] = useState([]);
-
+  const [companyCities, setCompanyCities] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
 
   const [form, setForm] = useState({
@@ -29,13 +33,31 @@ export default function ReportPage() {
     serialNumber: "",
     paletNumber: "",
     provincesAndCitiesId: 0,
+    destinationProvinceId: 0,
     kartDuration: 0,
     typeOfKart: 0,
     typeOfActivity: 0,
     kartNewRenewLost: 0,
-    chasis: ""
+    chasis: "",
+    reportDate: null
   });
-
+  const afghanLocale = {
+    ...persian_fa,
+    months: [
+      ["حمل", "حم"],
+      ["ثور", "ثو"],
+      ["جوزا", "جو"],
+      ["سرطان", "سر"],
+      ["اسد", "اسد"],
+      ["سنبله", "سن"],
+      ["میزان", "می"],
+      ["عقرب", "عق"],
+      ["قوس", "قو"],
+      ["جدی", "جد"],
+      ["دلو", "دل"],
+      ["حوت", "حو"],
+    ],
+  };
   // ---------------- FETCH ----------------
   const fetchReports = async () => {
     try {
@@ -70,25 +92,51 @@ export default function ReportPage() {
   }, []);
 
   // ---------------- HANDLE ----------------
-const handleChange = (e) => {
-  const { name, value } = e.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  setForm((prev) => ({
-    ...prev,
-    [name]:
-      value === "" ? null : isNaN(value) ? value : Number(value),
-  }));
-};
+    if (["serialNumber", "paletNumber", "chasis"].includes(name)) {
+      setForm({
+        ...form,
+        [name]: value,
+      });
+    } else {
+      setForm({
+        ...form,
+        [name]: value === "" ? null : Number(value),
+      });
+    }
+  };
 
   // ---------------- CREATE ----------------
   const create = async () => {
     try {
-      await axios.post(API_URL, form);
+
+      const payload = {
+        companyId: form.companyId,
+        serialNumber: form.serialNumber,
+        paletNumber: form.paletNumber,
+        provincesAndCitiesId: form.provincesAndCitiesId,
+        destinationProvinceId: form.destinationProvinceId || null,
+        kartDuration: form.kartDuration || null,
+        typeOfKart: form.typeOfKart || null,
+        typeOfActivity: form.typeOfActivity || null,
+        kartNewRenewLost: form.kartNewRenewLost || null,
+        chasis: form.chasis,
+        dateS: form.reportDate
+          ? form.reportDate.format("YYYY/MM/DD")
+          : null
+      };
+
+      await axios.post(API_URL, payload);
+
       toast.success("Report created");
 
       fetchReports();
       reset();
-    } catch {
+
+    } catch (err) {
+      console.log(err.response?.data);
       toast.error("Create failed");
     }
   };
@@ -96,13 +144,31 @@ const handleChange = (e) => {
   // ---------------- UPDATE ----------------
   const update = async () => {
     try {
-      await axios.put(`${API_URL}/${form.id}`, form);
+
+      const payload = {
+        ...form,
+        DateS:
+          form.reportDate
+            ? form.reportDate.format("YYYY/MM/DD")
+            : null
+      };
+
+
+      await axios.put(
+        `${API_URL}/${form.id}`,
+        payload
+      );
+
+
       toast.success("Report updated");
 
       fetchReports();
       reset();
+
     } catch {
+
       toast.error("Update failed");
+
     }
   };
 
@@ -120,12 +186,30 @@ const handleChange = (e) => {
 
   // ---------------- EDIT ----------------
   const edit = (r) => {
-    setForm(r);
+
+    setForm({
+      id: r.id,
+      companyId: r.companyId,
+      serialNumber: r.serialNumber,
+      paletNumber: r.paletNumber,
+      provincesAndCitiesId: r.provincesAndCitiesId,
+      kartDuration: r.kartDuration,
+      typeOfKart: r.typeOfKart,
+      typeOfActivity: r.typeOfActivity,
+      kartNewRenewLost: r.kartNewRenewLost,
+      chasis: r.chasis,
+
+      reportDate: r.dateS || null
+    });
+
     setIsEdit(true);
+
   };
 
   const reset = () => {
+
     setForm({
+
       id: 0,
       companyId: 0,
       serialNumber: "",
@@ -135,12 +219,33 @@ const handleChange = (e) => {
       typeOfKart: 0,
       typeOfActivity: 0,
       kartNewRenewLost: 0,
-      chasis: ""
+      chasis: "",
+      reportDate: null
+
     });
 
-    setIsEdit(false);
-  };
 
+    setIsEdit(false);
+
+  };
+  const getCompanyCities = async (companyId) => {
+
+    if (!companyId) {
+      setCompanyCities([]);
+      return;
+    }
+
+    try {
+      const res = await axios.get(
+        `${COMPANY_API}/${companyId}/locations`
+      );
+
+      setCompanyCities(res.data);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
   // ---------------- UI ----------------
   return (
     <div className="container mt-4">
@@ -156,6 +261,23 @@ const handleChange = (e) => {
           {/* COMPANY */}
           <div className="col-md-3">
             <select
+  className="form-select"
+  name="companyId"
+  value={form.companyId}
+  onChange={(e) => {
+    handleChange(e);
+    getCompanyCities(Number(e.target.value));
+  }}
+>
+  <option value={0}>Select Company</option>
+
+  {companies.map(c => (
+    <option key={c.id} value={c.id}>
+      {c.name}
+    </option>
+  ))}
+</select>
+            {/* <select
               className="form-select"
               name="companyId"
               value={form.companyId}
@@ -167,7 +289,7 @@ const handleChange = (e) => {
                   {c.name}
                 </option>
               ))}
-            </select>
+            </select> */}
           </div>
 
           {/* CITY */}
@@ -253,7 +375,67 @@ const handleChange = (e) => {
               ))}
             </select>
           </div>
+          <div className="col-md-3">
+            {/* <select
+              className="form-select"
+              name="destinationProvinceId"
+              value={form.destinationProvinceId}
+              onChange={handleChange}
+            >
+              <option value={0}>Taxi Destination</option>
 
+              {cities.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select> */}
+  <select
+    className="form-select"
+    name="destinationProvinceId"
+    value={form.destinationProvinceId}
+    onChange={handleChange}
+  >
+
+    <option value={0}>
+      Taxi Destination
+    </option>
+
+    {companyCities.map(c => (
+      <option key={c.id} value={c.id}>
+        {c.name}
+      </option>
+    ))}
+
+  </select>
+          </div>
+
+          <div className="col-md-3">
+            <DatePicker
+
+              value={form.reportDate}
+
+              onChange={(value) =>
+                setForm({
+                  ...form,
+                  reportDate: value
+                })
+              }
+
+              calendar={persian}
+
+              locale={afghanLocale}
+
+              format="YYYY/MM/DD"
+
+              placeholder="Select Date"
+
+              inputClass="form-control"
+
+            />
+
+
+          </div>
           <div className="col-md-3 d-grid">
             {isEdit ? (
               <button className="btn btn-warning" onClick={update}>
@@ -284,8 +466,9 @@ const handleChange = (e) => {
               <tr>
                 <th>ID</th>
                 <th>Company</th>
-                <th>City</th>
                 <th>Serial</th>
+                <th>Palet Number</th>
+                <th>Province</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -293,20 +476,41 @@ const handleChange = (e) => {
             <tbody>
               {reports.map(r => (
                 <tr key={r.id}>
+
                   <td>{r.id}</td>
-                  <td>{r.company?.name}</td>
-                  <td>{r.provincesAndCities?.name}</td>
-                  <td>{r.serialNumber}</td>
 
                   <td>
-                    <button className="btn btn-primary btn-sm me-2" onClick={() => edit(r)}>
+                    {r.company?.name}
+                  </td>
+                  <td>
+                    {r.serialNumber}
+                  </td>
+
+                  <td>
+                    {r.paletNumber}
+                  </td>
+                  <td>
+                    {r.provincesAndCities?.name}
+                  </td>
+                  <td>
+
+                    <button
+                      className="btn btn-primary btn-sm me-2"
+                      onClick={() => edit(r)}
+                    >
                       Edit
                     </button>
 
-                    <button className="btn btn-danger btn-sm" onClick={() => remove(r.id)}>
+
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => remove(r.id)}
+                    >
                       Delete
                     </button>
+
                   </td>
+
                 </tr>
               ))}
             </tbody>

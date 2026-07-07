@@ -5,7 +5,7 @@
 namespace KartKitabch.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCompanyLocation : Migration
+    public partial class AddColuminreport : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,6 +26,20 @@ namespace KartKitabch.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Person",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FatherName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Person", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProvincesAndCities",
                 columns: table => new
                 {
@@ -36,6 +50,19 @@ namespace KartKitabch.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProvincesAndCities", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vehicles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vehicles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -71,14 +98,17 @@ namespace KartKitabch.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CompanyId = table.Column<int>(type: "int", nullable: false),
-                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PaletNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaletNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProvincesAndCitiesId = table.Column<int>(type: "int", nullable: false),
-                    KartDuration = table.Column<int>(type: "int", nullable: false),
-                    TypeOfKart = table.Column<int>(type: "int", nullable: false),
-                    TypeOfActivity = table.Column<int>(type: "int", nullable: false),
-                    KartNewRenewLost = table.Column<int>(type: "int", nullable: false),
-                    Chasis = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DestinationProvinceId = table.Column<int>(type: "int", nullable: true),
+                    KartDuration = table.Column<int>(type: "int", nullable: true),
+                    TypeOfKart = table.Column<int>(type: "int", nullable: true),
+                    TypeOfActivity = table.Column<int>(type: "int", nullable: true),
+                    KartNewRenewLost = table.Column<int>(type: "int", nullable: true),
+                    DateS = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Chasis = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PersonId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -90,11 +120,22 @@ namespace KartKitabch.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Report_Person_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "Person",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Report_ProvincesAndCities_DestinationProvinceId",
+                        column: x => x.DestinationProvinceId,
+                        principalTable: "ProvincesAndCities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Report_ProvincesAndCities_ProvincesAndCitiesId",
                         column: x => x.ProvincesAndCitiesId,
                         principalTable: "ProvincesAndCities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -113,6 +154,16 @@ namespace KartKitabch.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Report_DestinationProvinceId",
+                table: "Report",
+                column: "DestinationProvinceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Report_PersonId",
+                table: "Report",
+                column: "PersonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Report_ProvincesAndCitiesId",
                 table: "Report",
                 column: "ProvincesAndCitiesId");
@@ -128,7 +179,13 @@ namespace KartKitabch.Migrations
                 name: "Report");
 
             migrationBuilder.DropTable(
+                name: "Vehicles");
+
+            migrationBuilder.DropTable(
                 name: "Companies");
+
+            migrationBuilder.DropTable(
+                name: "Person");
 
             migrationBuilder.DropTable(
                 name: "ProvincesAndCities");

@@ -67,6 +67,27 @@ namespace KartKitabch.Migrations
                     b.ToTable("CompanyLocations");
                 });
 
+            modelBuilder.Entity("KartKitabch.Models.Person", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FatherName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Person");
+                });
+
             modelBuilder.Entity("KartKitabch.Models.ProvincesAndCities", b =>
                 {
                     b.Property<int>("Id")
@@ -98,32 +119,44 @@ namespace KartKitabch.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<int>("KartDuration")
+                    b.Property<string>("DateS")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DestinationProvinceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("KartNewRenewLost")
+                    b.Property<int?>("KartDuration")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("KartNewRenewLost")
                         .HasColumnType("int");
 
                     b.Property<string>("PaletNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PersonId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProvincesAndCitiesId")
                         .HasColumnType("int");
 
                     b.Property<string>("SerialNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TypeOfActivity")
+                    b.Property<int?>("TypeOfActivity")
                         .HasColumnType("int");
 
-                    b.Property<int>("TypeOfKart")
+                    b.Property<int?>("TypeOfKart")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
+
+                    b.HasIndex("DestinationProvinceId");
+
+                    b.HasIndex("PersonId");
 
                     b.HasIndex("ProvincesAndCitiesId");
 
@@ -174,13 +207,24 @@ namespace KartKitabch.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("KartKitabch.Models.ProvincesAndCities", "DestinationProvince")
+                        .WithMany()
+                        .HasForeignKey("DestinationProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("KartKitabch.Models.Person", null)
+                        .WithMany("Reports")
+                        .HasForeignKey("PersonId");
+
                     b.HasOne("KartKitabch.Models.ProvincesAndCities", "ProvincesAndCities")
                         .WithMany()
                         .HasForeignKey("ProvincesAndCitiesId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Company");
+
+                    b.Navigation("DestinationProvince");
 
                     b.Navigation("ProvincesAndCities");
                 });
@@ -190,6 +234,11 @@ namespace KartKitabch.Migrations
                     b.Navigation("CompanyLocations");
 
                     b.Navigation("Report");
+                });
+
+            modelBuilder.Entity("KartKitabch.Models.Person", b =>
+                {
+                    b.Navigation("Reports");
                 });
 #pragma warning restore 612, 618
         }
