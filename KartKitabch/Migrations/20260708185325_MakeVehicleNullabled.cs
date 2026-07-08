@@ -5,7 +5,7 @@
 namespace KartKitabch.Migrations
 {
     /// <inheritdoc />
-    public partial class AddColuminreport : Migration
+    public partial class MakeVehicleNullabled : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -100,12 +100,15 @@ namespace KartKitabch.Migrations
                     CompanyId = table.Column<int>(type: "int", nullable: false),
                     SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaletNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProvincesAndCitiesId = table.Column<int>(type: "int", nullable: false),
+                    ProvincesAndCitiesId = table.Column<int>(type: "int", nullable: true),
+                    DestinationCompanyId = table.Column<int>(type: "int", nullable: true),
                     DestinationProvinceId = table.Column<int>(type: "int", nullable: true),
+                    ReportId = table.Column<int>(type: "int", nullable: true),
                     KartDuration = table.Column<int>(type: "int", nullable: true),
                     TypeOfKart = table.Column<int>(type: "int", nullable: true),
                     TypeOfActivity = table.Column<int>(type: "int", nullable: true),
                     KartNewRenewLost = table.Column<int>(type: "int", nullable: true),
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
                     DateS = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Chasis = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PersonId = table.Column<int>(type: "int", nullable: true)
@@ -118,7 +121,13 @@ namespace KartKitabch.Migrations
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Report_Companies_DestinationCompanyId",
+                        column: x => x.DestinationCompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Report_Person_PersonId",
                         column: x => x.PersonId,
@@ -136,6 +145,12 @@ namespace KartKitabch.Migrations
                         principalTable: "ProvincesAndCities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Report_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -154,6 +169,11 @@ namespace KartKitabch.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Report_DestinationCompanyId",
+                table: "Report",
+                column: "DestinationCompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Report_DestinationProvinceId",
                 table: "Report",
                 column: "DestinationProvinceId");
@@ -167,6 +187,11 @@ namespace KartKitabch.Migrations
                 name: "IX_Report_ProvincesAndCitiesId",
                 table: "Report",
                 column: "ProvincesAndCitiesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Report_VehicleId",
+                table: "Report",
+                column: "VehicleId");
         }
 
         /// <inheritdoc />
@@ -179,9 +204,6 @@ namespace KartKitabch.Migrations
                 name: "Report");
 
             migrationBuilder.DropTable(
-                name: "Vehicles");
-
-            migrationBuilder.DropTable(
                 name: "Companies");
 
             migrationBuilder.DropTable(
@@ -189,6 +211,9 @@ namespace KartKitabch.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProvincesAndCities");
+
+            migrationBuilder.DropTable(
+                name: "Vehicles");
         }
     }
 }

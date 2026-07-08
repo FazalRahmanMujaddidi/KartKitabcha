@@ -14,15 +14,20 @@
 public int? ProvincesAndCitiesId { get; set; }
 public ProvincesAndCities? ProvincesAndCities { get; set; }
 
+ // New company for changing
+    public int? DestinationCompanyId { get; set; }
+    public Company? DestinationCompany { get; set; }
 // Taxi destination
 public int? DestinationProvinceId { get; set; }
 public ProvincesAndCities? DestinationProvince { get; set; }
-
+public int? ReportId { get; set; }
         public KartDuration? KartDuration { get; set; }   // <-- Optional
         public TypeOfKart? TypeOfKart { get; set; }       // <-- Optional
 
         public TypeOfActivity? TypeOfActivity { get; set; }
         public KartNewRenewLost? KartNewRenewLost { get; set; }
+public int VehicleId { get; set; }
+public vehicle Vehicle { get; set; } = null!;
         public string DateS { get; set; }
 
         public string? Chasis { get; set; }

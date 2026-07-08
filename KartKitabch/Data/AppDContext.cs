@@ -17,21 +17,33 @@ namespace KartKitabch.Data
         public DbSet<Report> Report { get; set; }
         public DbSet<Person> Person { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+       protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.ProvincesAndCities)
-                .WithMany()
-                .HasForeignKey(r => r.ProvincesAndCitiesId)
-                .OnDelete(DeleteBehavior.Restrict);
+   modelBuilder.Entity<Report>()
+    .HasOne(r => r.Company)
+    .WithMany(c => c.Report)
+    .HasForeignKey(r => r.CompanyId)
+    .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.DestinationProvince)
-                .WithMany()
-                .HasForeignKey(r => r.DestinationProvinceId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+modelBuilder.Entity<Report>()
+    .HasOne(r => r.DestinationCompany)
+    .WithMany()
+    .HasForeignKey(r => r.DestinationCompanyId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+modelBuilder.Entity<Report>()
+    .HasOne(r => r.ProvincesAndCities)
+    .WithMany()
+    .HasForeignKey(r => r.ProvincesAndCitiesId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+modelBuilder.Entity<Report>()
+    .HasOne(r => r.DestinationProvince)
+    .WithMany()
+    .HasForeignKey(r => r.DestinationProvinceId)
+    .OnDelete(DeleteBehavior.Restrict);
+}
     }
 }

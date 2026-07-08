@@ -22,6 +22,7 @@ namespace KartKitabch.Controllers
         {
             return await _context.Report
                 .Include(x => x.Company)
+                .Include(x => x.Vehicle)
                 .Include(x => x.ProvincesAndCities)
                 .ToListAsync();
         }
@@ -32,6 +33,7 @@ namespace KartKitabch.Controllers
         {
             var item = await _context.Report
                 .Include(x => x.Company)
+                .Include(x => x.Vehicle)
                 .Include(x => x.ProvincesAndCities)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -41,32 +43,91 @@ namespace KartKitabch.Controllers
             return item;
         }
 
-        // CREATE
-        // [HttpPost]
-        // public async Task<IActionResult> Create(Report report)
-        // {
-        //     _context.Report.Add(report);
-        //     await _context.SaveChangesAsync();
 
-        //     return Ok(report);
-        // }
 [HttpPost]
 public async Task<IActionResult> Create([FromBody] Report report)
 {
     if (!ModelState.IsValid)
         return BadRequest(ModelState);
 
-
+    // Remove navigation properties
     report.Company = null;
     report.ProvincesAndCities = null;
+    report.DestinationCompany = null;
     report.DestinationProvince = null;
 
+    // Check if this taxi already exists
+    var existing = await _context.Report.FirstOrDefaultAsync(x =>
+        x.PaletNumber == report.PaletNumber &&
+        x.ProvincesAndCitiesId == report.ProvincesAndCitiesId);
 
-    _context.Report.Add(report);
+    // -------------------------
+    // New Taxi
+    // -------------------------
+    if (existing == null)
+    {
+        _context.Report.Add(report);
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "New taxi created successfully."
+        });
+    }
+
+    // -------------------------
+    // Existing Taxi -> Transfer
+    // -------------------------
+
+    // Current company becomes the selected company
+existing.CompanyId = report.CompanyId;
+existing.VehicleId = report.VehicleId;
+    // Save destination information
+    existing.DestinationCompanyId = report.DestinationCompanyId;
+    existing.DestinationProvinceId = report.DestinationProvinceId;
+
+    existing.SerialNumber = report.SerialNumber;
+    existing.Chasis = report.Chasis;
+    existing.DateS = report.DateS;
+
+    existing.KartDuration = report.KartDuration;
+    existing.TypeOfKart = report.TypeOfKart;
+    existing.TypeOfActivity = report.TypeOfActivity;
+    existing.KartNewRenewLost = report.KartNewRenewLost;
 
     await _context.SaveChangesAsync();
 
-    return Ok(report);
+    return Ok(new
+    {
+        message = "Taxi transferred successfully."
+    });
+}
+[HttpGet("check-existing")]
+public async Task<IActionResult> CheckExisting(
+    string paletNumber,
+    int provincesAndCitiesId)
+{
+    var existing = await _context.Report
+        .FirstOrDefaultAsync(x =>
+            x.PaletNumber == paletNumber &&
+            x.ProvincesAndCitiesId == provincesAndCitiesId);
+
+    if (existing == null)
+    {
+        return Ok(new
+        {
+            exists = false
+        });
+    }
+
+    return Ok(new
+    {
+        exists = true,
+        message = "This taxi already exists. It will be transferred.",
+        company = existing.Company?.Name,
+        id = existing.Id
+    });
 }
         // UPDATE
         [HttpPut("{id}")]
@@ -142,19 +203,6 @@ public IActionResult GetKartStatus()
         .Cast<KartNewRenewLost>()
         .Select(x => new { id = (int)x, name = x.ToString() }));
 }
-[HttpGet("{companyId}/locations")]
-public async Task<IActionResult> GetCompanyLocations(int companyId)
-{
-    var cities = await _context.CompanyLocations
-        .Where(x => x.CompanyId == companyId)
-        .Select(x => new
-        {
-            id = x.ProvincesAndCitiesId,
-            name = x.ProvincesAndCities.Name
-        })
-        .ToListAsync();
 
-    return Ok(cities);
-}
 }
 }

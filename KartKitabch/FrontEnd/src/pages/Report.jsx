@@ -9,7 +9,7 @@ const DatePicker = DatePickerModule.default;
 const API_URL = "http://localhost:5256/api/report";
 const COMPANY_API = "http://localhost:5256/api/company";
 const CITY_API = "http://localhost:5256/api/ProvincesAndCities";
-
+const VEHICLE_API = "http://localhost:5256/api/Vehicle";
 const ENUM_DURATION = `${API_URL}/enums/kart-duration`;
 const ENUM_KART = `${API_URL}/enums/type-of-kart`;
 const ENUM_ACTIVITY = `${API_URL}/enums/type-of-activity`;
@@ -26,18 +26,39 @@ export default function ReportPage() {
   const [statuses, setStatuses] = useState([]);
   const [companyCities, setCompanyCities] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
+  const [vehicles, setVehicles] = useState([]);
 
+  // const [form, setForm] = useState({
+  //   id: 0,
+  //   companyId: 0,
+  //   serialNumber: "",
+  //   paletNumber: "",
+  //   provincesAndCitiesId: 0,
+  //   destinationProvinceId: 0,
+  //   kartDuration: 0,
+  //   typeOfKart: 0,
+  //   typeOfActivity: 0,
+  //   kartNewRenewLost: 0,
+  //   chasis: "",
+  //   reportDate: null
+  // });
   const [form, setForm] = useState({
+
     id: 0,
     companyId: 0,
     serialNumber: "",
     paletNumber: "",
     provincesAndCitiesId: 0,
-    destinationProvinceId: 0,
+
+    destinationCompanyId: null,
+    destinationProvinceId: null,
+    reportId: null,
+    vehicleId: 0,
     kartDuration: 0,
     typeOfKart: 0,
     typeOfActivity: 0,
     kartNewRenewLost: 0,
+
     chasis: "",
     reportDate: null
   });
@@ -69,13 +90,14 @@ export default function ReportPage() {
   };
 
   const fetchDropdowns = async () => {
-    const [c, city, d, k, a, s] = await Promise.all([
+    const [c, city, d, k, a, s, v] = await Promise.all([
       axios.get(COMPANY_API),
       axios.get(CITY_API),
       axios.get(ENUM_DURATION),
       axios.get(ENUM_KART),
       axios.get(ENUM_ACTIVITY),
       axios.get(ENUM_STATUS),
+      axios.get(VEHICLE_API)
     ]);
 
     setCompanies(c.data);
@@ -84,6 +106,7 @@ export default function ReportPage() {
     setKartTypes(k.data);
     setActivities(a.data);
     setStatuses(s.data);
+    setVehicles(v.data);
   };
 
   useEffect(() => {
@@ -107,6 +130,22 @@ export default function ReportPage() {
       });
     }
   };
+  const handleProvinceChange = (e) => {
+
+    const provinceId = Number(e.target.value);
+
+    setForm({
+      ...form,
+      provincesAndCitiesId: provinceId
+    });
+
+    setTimeout(() => {
+      checkExistingTaxi({
+        provinceId: provinceId,
+        paletNumber: form.paletNumber
+      });
+    }, 300);
+  };
 
   // ---------------- CREATE ----------------
   const create = async () => {
@@ -117,15 +156,33 @@ export default function ReportPage() {
         serialNumber: form.serialNumber,
         paletNumber: form.paletNumber,
         provincesAndCitiesId: form.provincesAndCitiesId,
-        destinationProvinceId: form.destinationProvinceId || null,
-        kartDuration: form.kartDuration || null,
-        typeOfKart: form.typeOfKart || null,
-        typeOfActivity: form.typeOfActivity || null,
-        kartNewRenewLost: form.kartNewRenewLost || null,
+
+        destinationCompanyId:
+          form.destinationCompanyId || null,
+
+        destinationProvinceId:
+          form.destinationProvinceId || null,
+
+        reportId:
+          form.reportId || null,
+
+        kartDuration:
+          form.kartDuration || null,
+
+        typeOfKart:
+          form.typeOfKart || null,
+
+        typeOfActivity:
+          form.typeOfActivity || null,
+
+        kartNewRenewLost:
+          form.kartNewRenewLost || null,
+
         chasis: form.chasis,
+
         dateS: form.reportDate
-          ? form.reportDate.format("YYYY/MM/DD")
-          : null
+          ? form.reportDate.format("YYYY/MM/DD"): null,
+          vehicleId: form.vehicleId,
       };
 
       await axios.post(API_URL, payload);
@@ -246,6 +303,43 @@ export default function ReportPage() {
       console.log(err);
     }
   };
+  const checkExistingTaxi = async () => {
+
+    if (
+      !form.paletNumber ||
+      !form.provincesAndCitiesId
+    ) {
+      return;
+    }
+
+    try {
+
+      const res = await axios.get(
+        `${API_URL}/check-existing`,
+        {
+          params: {
+            paletNumber: form.paletNumber,
+            provincesAndCitiesId: form.provincesAndCitiesId
+          }
+        }
+      );
+
+
+      if (res.data.exists) {
+
+        toast.warning(
+          res.data.message
+        );
+
+      }
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+
+  };
   // ---------------- UI ----------------
   return (
     <div className="container mt-4">
@@ -261,35 +355,22 @@ export default function ReportPage() {
           {/* COMPANY */}
           <div className="col-md-3">
             <select
-  className="form-select"
-  name="companyId"
-  value={form.companyId}
-  onChange={(e) => {
-    handleChange(e);
-    getCompanyCities(Number(e.target.value));
-  }}
->
-  <option value={0}>Select Company</option>
-
-  {companies.map(c => (
-    <option key={c.id} value={c.id}>
-      {c.name}
-    </option>
-  ))}
-</select>
-            {/* <select
               className="form-select"
               name="companyId"
               value={form.companyId}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                getCompanyCities(Number(e.target.value));
+              }}
             >
               <option value={0}>Select Company</option>
+
               {companies.map(c => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
-            </select> */}
+            </select>
           </div>
 
           {/* CITY */}
@@ -298,14 +379,16 @@ export default function ReportPage() {
               className="form-select"
               name="provincesAndCitiesId"
               value={form.provincesAndCitiesId}
-              onChange={handleChange}
+              onChange={handleProvinceChange}
             >
-              <option value={0}>Select City</option>
+              <option value={0}>Select Province/City</option>
+
               {cities.map(c => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
+
             </select>
           </div>
 
@@ -320,12 +403,22 @@ export default function ReportPage() {
           </div>
 
           <div className="col-md-3">
-            <input
+            {/* <input
               className="form-control"
               name="paletNumber"
               placeholder="Palet Number"
               value={form.paletNumber}
               onChange={handleChange}
+            /> */}
+            <input
+              className="form-control"
+              name="paletNumber"
+              placeholder="Palet Number"
+              value={form.paletNumber}
+              onChange={(e) => {
+                handleChange(e);
+              }}
+              onBlur={checkExistingTaxi}
             />
           </div>
 
@@ -390,31 +483,46 @@ export default function ReportPage() {
                 </option>
               ))}
             </select> */}
-  <select
-    className="form-select"
-    name="destinationProvinceId"
-    value={form.destinationProvinceId}
-    onChange={handleChange}
-  >
+            <select
+              className="form-select"
+              name="destinationProvinceId"
+              value={form.destinationProvinceId}
+              onChange={handleChange}
+            >
 
-    <option value={0}>
-      Taxi Destination
-    </option>
+              <option value={0}>
+                Taxi Destination
+              </option>
 
-    {companyCities.map(c => (
-      <option key={c.id} value={c.id}>
-        {c.name}
-      </option>
-    ))}
+              {companyCities.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
 
-  </select>
+            </select>
           </div>
-
+          <div className="col-md-3">
+            <select
+              className="form-select"
+              name="vehicleId"
+              value={form.vehicleId}
+              onChange={handleChange} >
+              <option value={0}>
+                Select Vehicle
+              </option>
+              {vehicles.map(v => (
+                <option
+                  key={v.id}
+                  value={v.id} >
+                  {v.type}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="col-md-3">
             <DatePicker
-
               value={form.reportDate}
-
               onChange={(value) =>
                 setForm({
                   ...form,

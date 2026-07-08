@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KartKitabch.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260707162218_AddColuminreport")]
-    partial class AddColuminreport
+    [Migration("20260708185325_MakeVehicleNullabled")]
+    partial class MakeVehicleNullabled
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -126,6 +126,9 @@ namespace KartKitabch.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("DestinationCompanyId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DestinationProvinceId")
                         .HasColumnType("int");
 
@@ -141,7 +144,10 @@ namespace KartKitabch.Migrations
                     b.Property<int?>("PersonId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProvincesAndCitiesId")
+                    b.Property<int?>("ProvincesAndCitiesId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReportId")
                         .HasColumnType("int");
 
                     b.Property<string>("SerialNumber")
@@ -153,15 +159,22 @@ namespace KartKitabch.Migrations
                     b.Property<int?>("TypeOfKart")
                         .HasColumnType("int");
 
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
+
+                    b.HasIndex("DestinationCompanyId");
 
                     b.HasIndex("DestinationProvinceId");
 
                     b.HasIndex("PersonId");
 
                     b.HasIndex("ProvincesAndCitiesId");
+
+                    b.HasIndex("VehicleId");
 
                     b.ToTable("Report");
                 });
@@ -207,8 +220,13 @@ namespace KartKitabch.Migrations
                     b.HasOne("KartKitabch.Models.Company", "Company")
                         .WithMany("Report")
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("KartKitabch.Models.Company", "DestinationCompany")
+                        .WithMany()
+                        .HasForeignKey("DestinationCompanyId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("KartKitabch.Models.ProvincesAndCities", "DestinationProvince")
                         .WithMany()
@@ -222,14 +240,23 @@ namespace KartKitabch.Migrations
                     b.HasOne("KartKitabch.Models.ProvincesAndCities", "ProvincesAndCities")
                         .WithMany()
                         .HasForeignKey("ProvincesAndCitiesId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("KartKitabch.Models.vehicle", "Vehicle")
+                        .WithMany("Reports")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Company");
 
+                    b.Navigation("DestinationCompany");
+
                     b.Navigation("DestinationProvince");
 
                     b.Navigation("ProvincesAndCities");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("KartKitabch.Models.Company", b =>
@@ -240,6 +267,11 @@ namespace KartKitabch.Migrations
                 });
 
             modelBuilder.Entity("KartKitabch.Models.Person", b =>
+                {
+                    b.Navigation("Reports");
+                });
+
+            modelBuilder.Entity("KartKitabch.Models.vehicle", b =>
                 {
                     b.Navigation("Reports");
                 });

@@ -199,5 +199,6 @@ public async Task<IActionResult> GetCompanyLocations(int companyId)
 
     return Ok(cities);
 }
+
     }
 }
