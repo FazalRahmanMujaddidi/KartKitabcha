@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KartKitabch.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260708185325_MakeVehicleNullabled")]
-    partial class MakeVehicleNullabled
+    [Migration("20260709035035_DataBaseKart")]
+    partial class DataBaseKart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

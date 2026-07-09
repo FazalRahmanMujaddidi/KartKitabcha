@@ -101,46 +101,48 @@ export default function VehiclePage() {
           Vehicle Form
         </div>
 
-        <div className="card-body">
-          <div className="row">
+<div className="card-body">
+  <div className="row">
 
-            <div className="col-md-9">
-              <input
-                className="form-control"
-                name="type"
-                placeholder="Vehicle Type"
-                value={form.type}
-                onChange={handleChange}
-              />
-            </div>
+    <div className="col-12 mb-3">
+      <input
+        className="form-control"
+        name="type"
+        placeholder="Vehicle Type"
+        value={form.type}
+        onChange={handleChange}
+      />
+    </div>
 
-            <div className="col-md-3 d-grid">
-              {isEdit ? (
-                <button
-                  className="btn btn-warning"
-                  onClick={updateVehicle}
-                >
-                  Update
-                </button>
-              ) : (
-                <button
-                  className="btn btn-success"
-                  onClick={createVehicle}
-                >
-                  Create
-                </button>
-              )}
-            </div>
+    <div className="col-6">
+      {isEdit ? (
+        <button
+          className="btn btn-warning w-100"
+          onClick={updateVehicle}
+        >
+          Update
+        </button>
+      ) : (
+        <button
+          className="btn btn-success w-100"
+          onClick={createVehicle}
+        >
+          Create
+        </button>
+      )}
+    </div>
 
-          </div>
+    <div className="col-6">
+      <button
+        className="btn btn-secondary w-100"
+        onClick={resetForm}
+      >
+        Reset
+      </button>
+    </div>
 
-          <button
-            className="btn btn-secondary mt-3"
-            onClick={resetForm}
-          >
-            Reset
-          </button>
-        </div>
+  </div>
+</div>
       </div>
 
       <div className="card shadow-sm">

@@ -39,33 +39,33 @@ namespace KartKitabch.Controllers
 
             return company;
         }
-[HttpGet("enums/company-type")]
-public IActionResult GetCompanyTypes()
-{
-    var values = Enum.GetValues(typeof(CompanyType))
-        .Cast<CompanyType>()
-        .Select(x => new
+        [HttpGet("enums/company-type")]
+        public IActionResult GetCompanyTypes()
         {
-            id = (int)x,
-            name = x.ToString()
-        });
+            var values = Enum.GetValues(typeof(CompanyType))
+                .Cast<CompanyType>()
+                .Select(x => new
+                {
+                    id = (int)x,
+                    name = x.ToString()
+                });
 
-    return Ok(values);
-}
+            return Ok(values);
+        }
 
-[HttpGet("enums/company-ton")]
-public IActionResult GetCompanyTons()
-{
-    var values = Enum.GetValues(typeof(CompanyTon))
-        .Cast<CompanyTon>()
-        .Select(x => new
+        [HttpGet("enums/company-ton")]
+        public IActionResult GetCompanyTons()
         {
-            id = (int)x,
-            name = x.ToString()
-        });
+            var values = Enum.GetValues(typeof(CompanyTon))
+                .Cast<CompanyTon>()
+                .Select(x => new
+                {
+                    id = (int)x,
+                    name = x.ToString()
+                });
 
-    return Ok(values);
-}
+            return Ok(values);
+        }
         // ✅ POST: api/company
         [HttpPost]
         public async Task<ActionResult<Company>> Create(Company company)
@@ -104,35 +104,46 @@ public IActionResult GetCompanyTons()
 
             return NoContent();
         }
-// GET BY ID (DETAIL)
-// [HttpGet("details/{id}")]
-// public async Task<IActionResult> Details(int id)
-// {
-//     var company = await _context.Companies
-//         .Where(c => c.Id == id)
-//         .Select(c => new
-//         {
-//             c.Id,
-//             c.Name,
-//             MyProperty = c.MyProperty.ToString(),
-//             CompanyTon = c.CompanyTon.ToString(),
+        // [HttpGet("details/{id}")]
+        // public async Task<IActionResult> Details(int id)
+        // {
+        //     var company = await _context.Companies
+        //         .Where(c => c.Id == id)
+        //         .Select(c => new
+        //         {
+        //             c.Id,
+        //             c.Name,
+        //             MyProperty = c.MyProperty.ToString(),
+        //             CompanyTon = c.CompanyTon.ToString(),
 
-//             Locations = c.CompanyLocations.Select(l => new
-//             {
-//                 l.Id,
-//                 CompanyId = l.CompanyId,
-//                 CityId = l.ProvincesAndCitiesId,
-//                 CityName = l.ProvincesAndCities.Name
-//             }).ToList()
-//         })
-//         .FirstOrDefaultAsync();
+        //             Locations = c.CompanyLocations.Select(l => new
+        //             {
+        //                 l.Id,
+        //                 CompanyId = l.CompanyId,
 
-//     if (company == null)
-//         return NotFound();
+        //                 CityId = l.ProvincesAndCitiesId,
 
-//     return Ok(company);
-// }
-[HttpGet("details/{id}")]
+        //                 CityName = l.ProvincesAndCities.Name,
+
+
+        //                 // تعداد Report هایی که مقصد آنها این شهر است
+        //                 DestinationCount = _context.Report.Count(r =>
+        //                     r.CompanyId == c.Id &&
+        //                     r.DestinationProvinceId == l.ProvincesAndCitiesId
+        //                 )
+
+        //             }).ToList()
+        //         })
+        //         .FirstOrDefaultAsync();
+
+
+        //     if (company == null)
+        //         return NotFound();
+
+
+        //     return Ok(company);
+        // }
+       [HttpGet("details/{id}")]
 public async Task<IActionResult> Details(int id)
 {
     var company = await _context.Companies
@@ -141,33 +152,52 @@ public async Task<IActionResult> Details(int id)
         {
             c.Id,
             c.Name,
+
             MyProperty = c.MyProperty.ToString(),
             CompanyTon = c.CompanyTon.ToString(),
+
+            // General reports (DestinationProvinceId == null)
+            GeneralCount = _context.Report.Count(r =>
+                r.CompanyId == c.Id &&
+                r.DestinationProvinceId == null
+            ),
+
+            GeneralVehicleTypes = _context.Report
+                .Where(r =>
+                    r.CompanyId == c.Id &&
+                    r.DestinationProvinceId == null
+                )
+                .Select(r => r.Vehicle.Type)
+                .Distinct()
+                .ToList(),
 
             Locations = c.CompanyLocations.Select(l => new
             {
                 l.Id,
-                CompanyId = l.CompanyId,
-
                 CityId = l.ProvincesAndCitiesId,
-
                 CityName = l.ProvincesAndCities.Name,
 
-
-                // تعداد Report هایی که مقصد آنها این شهر است
                 DestinationCount = _context.Report.Count(r =>
                     r.CompanyId == c.Id &&
                     r.DestinationProvinceId == l.ProvincesAndCitiesId
-                )
+                ),
+
+                VehicleTypes = _context.Report
+                    .Where(r =>
+                        r.CompanyId == c.Id &&
+                        r.DestinationProvinceId == l.ProvincesAndCitiesId
+                    )
+                    .Select(r => r.Vehicle.Type)
+                    .Distinct()
+                    .ToList()
 
             }).ToList()
+
         })
         .FirstOrDefaultAsync();
 
-
     if (company == null)
         return NotFound();
-
 
     return Ok(company);
 }
@@ -186,19 +216,19 @@ public async Task<IActionResult> Details(int id)
             return NoContent();
         }
         [HttpGet("{companyId}/locations")]
-public async Task<IActionResult> GetCompanyLocations(int companyId)
-{
-    var cities = await _context.CompanyLocations
-        .Where(x => x.CompanyId == companyId)
-        .Select(x => new
+        public async Task<IActionResult> GetCompanyLocations(int companyId)
         {
-            id = x.ProvincesAndCitiesId,
-            name = x.ProvincesAndCities.Name
-        })
-        .ToListAsync();
+            var cities = await _context.CompanyLocations
+                .Where(x => x.CompanyId == companyId)
+                .Select(x => new
+                {
+                    id = x.ProvincesAndCitiesId,
+                    name = x.ProvincesAndCities.Name
+                })
+                .ToListAsync();
 
-    return Ok(cities);
-}
+            return Ok(cities);
+        }
 
     }
 }

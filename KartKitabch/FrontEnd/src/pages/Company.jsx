@@ -118,6 +118,22 @@ export default function CompanyPage() {
       toast.error("Failed to load details");
     }
   };
+  const getVehicleEmoji = (types) => {
+
+  if (!types || types.length === 0)
+    return "🚕";
+
+  if (types.includes("Taxi"))
+    return "🚕";
+
+  if (types.includes("Truck"))
+    return "🚛";
+
+  if (types.includes("Bus"))
+    return "🚌";
+
+  return "🚕";
+};
   return (
     <div className="container mt-4">
       <h2 className="mb-4 text-primary">Company Management</h2>
@@ -242,110 +258,79 @@ export default function CompanyPage() {
 
 
           <hr />
+{selectedItem && (
+  <>
 
-          <h6>Locations</h6>
+    {selectedItem.locations?.length > 0 ? (
 
-          {selectedItem && (
-            <div className="card mt-4 shadow border-0">
+      <div className="row g-3">
 
-              {/* HEADER */}
-              <div className="card-header bg-primary text-white">
-                <h5 className="mb-0">Company Details</h5>
-              </div>
+        {selectedItem.locations.map((l) => (
+          <div key={l.id} className="col-12 col-md-6 col-lg-4">
 
-              <div className="card-body p-4">
+            <div className="card h-100 border-0 shadow-sm">
 
-                {/* BASIC INFO */}
-                <div className="row g-3">
+              <div className="card-body">
 
-                  <div className="col-12 col-md-6">
-                    <div className="p-3 bg-light rounded">
-                      <small className="text-muted">ID</small>
-                      <div className="fw-bold">{selectedItem.id}</div>
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6">
-                    <div className="p-3 bg-light rounded">
-                      <small className="text-muted">Name</small>
-                      <div className="fw-bold">{selectedItem.name}</div>
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6">
-                    <div className="p-3 bg-light rounded">
-                      <small className="text-muted">Type</small>
-                      <div className="fw-bold">
-                        {selectedItem.myProperty}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-12 col-md-6">
-                    <div className="p-3 bg-light rounded">
-                      <small className="text-muted">Ton</small>
-                      <div className="fw-bold">
-                        {selectedItem.companyTon}
-                      </div>
-                    </div>
-                  </div>
-
+                <div className="fw-bold text-primary mb-2">
+                  📍
+                  {getVehicleEmoji(l.vehicleTypes)}  {l.cityName}
                 </div>
 
-                {/* DIVIDER */}
-                <hr className="my-4" />
-
-                {/* LOCATIONS */}
-                <h6 className="mb-3 text-secondary">Locations</h6>
-
-                {selectedItem.locations?.length > 0 ? (
-                  <div className="row g-3">
-
-                    {selectedItem.locations.map((l) => (
-                      <div key={l.id} className="col-12 col-md-6 col-lg-4">
-
-                        <div className="card h-100 border-0 shadow-sm">
-
-                          <div className="card-body">
-
-                            <div className="fw-bold text-primary mb-2">
-                              📍🚕 {l.cityName}
-                            </div>
-
-                            <div className="small text-muted">
-                              <div className="text-success fw-bold">
-                                 Destination: {l.destinationCount}
-                              </div>
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                      </div>
-                    ))}
-
-                  </div>
-                ) : (
-                  <div className="alert alert-warning mb-0">
-                    No locations found
-                  </div>
-
-                )}
-
-                {/* CLOSE BUTTON */}
-                <div className="mt-4 text-end">
-                  <button
-                    className="btn btn-outline-secondary btn-sm"
-                    onClick={() => setSelectedItem(null)}
-                  >
-                    Close
-                  </button>
-                </div>
+<div className="text-success fw-bold">
+  {getVehicleEmoji(l.vehicleTypes)} : {l.destinationCount}
+</div>
 
               </div>
+
             </div>
-          )}
+
+          </div>
+        ))}
+
+      </div>
+
+    ) : null}
+
+
+{selectedItem.generalCount > 0 && (
+  <div className="col-12 col-md-6 col-lg-4 mt-3">
+    <div className="card border-0 shadow-sm h-100">
+      <div className="card-body d-flex align-items-center">
+
+        <div className="fs-2 text-primary me-3">
+         {getVehicleEmoji(selectedItem.generalVehicleTypes)}
+        </div>
+
+        <div>
+          <div className="text-muted small">
+            General Destination
+          </div>
+
+          <div className="fw-bold text-success">
+            {selectedItem.generalCount}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+)}
+
+
+    {
+      (!selectedItem.locations || selectedItem.locations.length === 0)
+      && selectedItem.generalCount === 0
+      &&
+      (
+        <div className="alert alert-warning">
+          No locations found
+        </div>
+      )
+    }
+
+  </>
+)}
         </div>
       </div>
     </div>

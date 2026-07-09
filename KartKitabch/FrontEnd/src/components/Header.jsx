@@ -33,24 +33,44 @@ export default function Header() {
                 Companies
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/provinces">
-                Province
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/company-location">
-                Company Locations
-              </NavLink>
+            <li className="nav-item dropdown">
+              <a
+                className="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Locations
+              </a>
+
+              <ul className="dropdown-menu">
+                <li>
+                  <NavLink className="dropdown-item" to="/provinces">
+                    Province
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink className="dropdown-item" to="/company-location">
+                    Company Root
+                  </NavLink>
+                </li>
+              </ul>
             </li>
             <li className="nav-item">
               <NavLink className="nav-link" to="/vehicle">
                 Vehicle
               </NavLink>
             </li>
-                        <li className="nav-item">
+            <li className="nav-item">
               <NavLink className="nav-link" to="/report">
                 Report
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/letter">
+                Letter
               </NavLink>
             </li>
           </ul>

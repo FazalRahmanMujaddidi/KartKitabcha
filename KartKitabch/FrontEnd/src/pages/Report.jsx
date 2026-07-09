@@ -28,20 +28,6 @@ export default function ReportPage() {
   const [isEdit, setIsEdit] = useState(false);
   const [vehicles, setVehicles] = useState([]);
 
-  // const [form, setForm] = useState({
-  //   id: 0,
-  //   companyId: 0,
-  //   serialNumber: "",
-  //   paletNumber: "",
-  //   provincesAndCitiesId: 0,
-  //   destinationProvinceId: 0,
-  //   kartDuration: 0,
-  //   typeOfKart: 0,
-  //   typeOfActivity: 0,
-  //   kartNewRenewLost: 0,
-  //   chasis: "",
-  //   reportDate: null
-  // });
   const [form, setForm] = useState({
 
     id: 0,
@@ -255,7 +241,7 @@ export default function ReportPage() {
       typeOfActivity: r.typeOfActivity,
       kartNewRenewLost: r.kartNewRenewLost,
       chasis: r.chasis,
-
+      vehicleId: r.vehicleId,
       reportDate: r.dateS || null
     });
 
@@ -277,8 +263,8 @@ export default function ReportPage() {
       typeOfActivity: 0,
       kartNewRenewLost: 0,
       chasis: "",
-      reportDate: null
-
+      reportDate: null,
+      vehicleId: 0
     });
 
 
@@ -403,13 +389,6 @@ export default function ReportPage() {
           </div>
 
           <div className="col-md-3">
-            {/* <input
-              className="form-control"
-              name="paletNumber"
-              placeholder="Palet Number"
-              value={form.paletNumber}
-              onChange={handleChange}
-            /> */}
             <input
               className="form-control"
               name="paletNumber"

@@ -5,7 +5,7 @@
 namespace KartKitabch.Migrations
 {
     /// <inheritdoc />
-    public partial class MakeVehicleNullabled : Migration
+    public partial class DataBaseKart : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
