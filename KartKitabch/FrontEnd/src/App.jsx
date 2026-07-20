@@ -9,6 +9,7 @@ import Vehicle from "./pages/Vehicle";
 import ReportPage from "./pages/Report";
 import LetterPage from "./pages/Letter";
 import "react-toastify/dist/ReactToastify.css";
+import Maktob from "./components/letter/maktob";
 import { ToastContainer } from "react-toastify";
 
 function App() {
@@ -22,9 +23,10 @@ function App() {
           <Route path="/companies" element={<CompanyPage />} />
           <Route path="/provinces" element={<ProvincesAndCitiesPage />} />
           <Route path="/company-location" element={<CompanyLocationPage />} />
-         <Route path="/vehicle" element={<Vehicle />} />
-         <Route path="/report" element={<ReportPage/>} />
-          <Route path="/letter" element={<LetterPage/>} />
+          <Route path="/vehicle" element={<Vehicle />} />
+          <Route path="/report" element={<ReportPage />} />
+          <Route path="/letter" element={<LetterPage />} />
+           <Route path="/maktob" element={<Maktob />} />
         </Routes>
       </BrowserRouter>
 

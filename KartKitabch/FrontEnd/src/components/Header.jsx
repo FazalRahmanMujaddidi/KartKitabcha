@@ -68,11 +68,32 @@ export default function Header() {
                 Report
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/letter">
-                Letter
-              </NavLink>
-            </li>
+<li className="nav-item dropdown">
+  <a
+    className="nav-link dropdown-toggle"
+    href="#"
+    id="letterDropdown"
+    role="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    Letter
+  </a>
+
+  <ul className="dropdown-menu" aria-labelledby="letterDropdown">
+    <li>
+      <NavLink className="dropdown-item" to="/letter">
+        Letter
+      </NavLink>
+    </li>
+
+    <li>
+      <NavLink className="dropdown-item" to="/maktob">
+        Maktob
+      </NavLink>
+    </li>
+  </ul>
+</li>
           </ul>
         </div>
 
