@@ -19,7 +19,7 @@ namespace KartKitabch.Models
         // New company for changing
         public int? DestinationCompanyId { get; set; }
         public Company? DestinationCompany { get; set; }
-       // Taxi destination
+        // Taxi destination
         public int? DestinationProvinceId { get; set; }
         public ProvincesAndCities? DestinationProvince { get; set; }
         public int? ReportId { get; set; }
@@ -32,32 +32,36 @@ namespace KartKitabch.Models
 
         [ValidateNever]
         public vehicle Vehicle { get; set; } = null!;
+        public int? GPSCompanyId { get; set; }
+
+        [ValidateNever]
+        public GPSCompany? GPSCompany { get; set; } = null!;
         public string DateS { get; set; }
 
         public string? Chasis { get; set; }
     }
     public enum KartDuration
-{
-    One = 1,
-    Three = 2
-}
+    {
+        یو = 1,
+        دری = 2
+    }
 
-public enum TypeOfKart
-{
-    Grand = 1,
-    Simple = 2
-}
+    public enum TypeOfKart
+    {
+        تضمینی = 1,
+        ساده = 2
+    }
 
-public enum TypeOfActivity
-{
-    OutCity = 1,
-    InsideCity = 2
-}
+    public enum TypeOfActivity
+    {
+        اطرافی = 1,
+        شهری = 2
+    }
 
-public enum KartNewRenewLost
-{
-    New = 1,
-    Renew = 2,
-    Lost = 3
-}
+    public enum KartNewRenewLost
+    {
+        جدید = 1,
+        تجدید = 2,
+        مثنی = 3
+    }
 }

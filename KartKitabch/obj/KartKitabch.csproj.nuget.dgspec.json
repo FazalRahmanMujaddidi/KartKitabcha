@@ -55,7 +55,7 @@
           "dependencies": {
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
-              "version": "[10.0.9, )",
+              "version": "[10.0.12, )",
               "noWarn": [
                 "NU1605"
               ]
@@ -67,23 +67,23 @@
                 "NU1605"
               ]
             },
-            "Microsoft.AspNetCore.OpenApi": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[10.0.9, )"
+              "version": "[10.0.12, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[10.0.9, )"
+              "version": "[10.0.12, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[10.0.9, )"
+              "version": "[10.0.12, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.9, )"
+              "version": "[10.0.12, )"
             },
             "Microsoft.Identity.Web": {
               "target": "Package",
@@ -113,7 +113,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.303/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

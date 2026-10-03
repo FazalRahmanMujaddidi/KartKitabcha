@@ -17,15 +17,15 @@
 
     public enum CompanyType
     {
-        Taxi = 1,
-    Bus = 2,
-    BarBari = 3
+        تکسی = 1,
+        بس = 2,
+        باربری = 3
     }
 
     public enum CompanyTon
     {
-        MediumTon = 1,
-    BigTon = 2
-}
-    
+        متوسط = 1,
+        بلند = 2
+    }
+
 }

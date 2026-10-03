@@ -1,12 +1,32 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
+import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
-const API_URL = "http://localhost:5256/api/CompanyLocation";
-const COMPANY_API = "http://localhost:5256/api/company";
-const CITY_API = "http://localhost:5256/api/ProvincesAndCities";
+// یوازې درې رنګونه
+const COLORS = {
+  dark: "#343148",
+  light: "#cdc6bd",
+  brown: "#583432",
+};
 
 export default function CompanyLocationPage() {
+  const { loading: authLoading, hasRole } = useAuth();
+
+  // Roles
+  const isOwner = hasRole("Owner");
+  const isSimpleUser = hasRole("SimpleUser");
+  const isCompanyUser = hasRole("CompanyUser");
+
+  // Permissions
+  // Owner: هر څه
+  // SimpleUser: یوازې لیدل او اضافه کول
+  // CompanyUser: هېڅ اجازه نه لري
+  const canView = isOwner || isSimpleUser;
+  const canCreate = isOwner || isSimpleUser;
+  const canEdit = isOwner;
+  const canDelete = isOwner;
+
   const [items, setItems] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [cities, setCities] = useState([]);
@@ -19,98 +39,200 @@ export default function CompanyLocationPage() {
 
   const [isEdit, setIsEdit] = useState(false);
 
-  // GET ALL
+  // ==============================
+  // ټول معلومات ترلاسه کول
+  // ==============================
   const fetchAll = async () => {
+    if (!canView) return;
+
     try {
-      const res = await axios.get(API_URL);
+      const res = await api.get("/CompanyLocation");
       setItems(res.data);
-    } catch {
-      toast.error("Failed to load locations");
+    } catch (error) {
+      if (error.response?.status === 401) {
+        toast.error("ستاسو ناسته ختمه شوې ده");
+        return;
+      }
+
+      if (error.response?.status === 403) {
+        toast.error("تاسو دې معلوماتو ته د لاسرسي اجازه نه لرئ");
+        return;
+      }
+
+      toast.error("د ځایونو معلومات ترلاسه نه شول");
     }
   };
 
-  // Load dropdowns
+  // ==============================
+  // شرکتونه او ښارونه ترلاسه کول
+  // ==============================
   const fetchDropdowns = async () => {
+    if (!canView) return;
+
     try {
-      const companiesRes = await axios.get(COMPANY_API);
-      const citiesRes = await axios.get(CITY_API);
+      const [companiesRes, citiesRes] = await Promise.all([
+        api.get("/company"),
+        api.get("/ProvincesAndCities"),
+      ]);
 
       setCompanies(companiesRes.data);
       setCities(citiesRes.data);
-    } catch {
-      toast.error("Failed to load dropdowns");
+    } catch (error) {
+      if (error.response?.status === 403) {
+        toast.error("تاسو دې معلوماتو ته د لاسرسي اجازه نه لرئ");
+        return;
+      }
+
+      toast.error("د شرکتونو او ښارونو معلومات ترلاسه نه شول");
     }
   };
 
+  // ==============================
+  // د Auth له چمتو کېدو وروسته معلومات
+  // ==============================
   useEffect(() => {
+    if (authLoading) return;
+
+    if (!canView) return;
+
     fetchAll();
     fetchDropdowns();
-  }, []);
+  }, [authLoading, canView]);
 
+  // ==============================
+  // د فورم بدلون
+  // ==============================
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setForm({
-      ...form,
-      [name]: value === "" ? "" : parseInt(value),
-    });
+    setForm((previous) => ({
+      ...previous,
+      [name]: value === "" ? "" : parseInt(value, 10),
+    }));
   };
 
-  // CREATE
+  // ==============================
+  // اضافه کول
+  // ==============================
   const create = async () => {
+    if (!canCreate) {
+      toast.error("تاسو د اضافه کولو اجازه نه لرئ");
+      return;
+    }
+
+    if (!form.companyId || !form.provincesAndCitiesId) {
+      toast.error("مهرباني وکړئ شرکت او ښار وټاکئ");
+      return;
+    }
+
     try {
-      await axios.post(API_URL, {
+      await api.post("/CompanyLocation", {
         companyId: form.companyId,
         provincesAndCitiesId: form.provincesAndCitiesId,
       });
 
-      toast.success("Location added");
-      fetchAll();
+      toast.success("ځای په بریالیتوب سره اضافه شو");
+
+      await fetchAll();
       resetForm();
-    } catch {
-      toast.error("Failed to add");
+    } catch (error) {
+      if (error.response?.status === 403) {
+        toast.error("تاسو د اضافه کولو اجازه نه لرئ");
+        return;
+      }
+
+      toast.error("ځای اضافه نه شو");
     }
   };
 
-  // UPDATE
+  // ==============================
+  // نوي کول
+  // یوازې Owner
+  // ==============================
   const update = async () => {
+    if (!canEdit) {
+      toast.error("یوازې Owner د سمولو اجازه لري");
+      return;
+    }
+
+    if (!form.companyId || !form.provincesAndCitiesId) {
+      toast.error("مهرباني وکړئ شرکت او ښار وټاکئ");
+      return;
+    }
+
     try {
-      await axios.put(`${API_URL}/${form.id}`, {
+      await api.put(`/CompanyLocation/${form.id}`, {
         companyId: form.companyId,
         provincesAndCitiesId: form.provincesAndCitiesId,
       });
 
-      toast.success("Location updated");
-      fetchAll();
+      toast.success("ځای په بریالیتوب سره نوي شو");
+
+      await fetchAll();
       resetForm();
-    } catch {
-      toast.error("Update failed");
+    } catch (error) {
+      if (error.response?.status === 403) {
+        toast.error("یوازې Owner د سمولو اجازه لري");
+        return;
+      }
+
+      toast.error("ځای نوي نه شو");
     }
   };
 
-  // DELETE
+  // ==============================
+  // حذف کول
+  // یوازې Owner
+  // ==============================
   const deleteItem = async (id) => {
+    if (!canDelete) {
+      toast.error("یوازې Owner د حذف کولو اجازه لري");
+      return;
+    }
+
+    if (!window.confirm("ایا غواړئ دا ځای حذف کړئ؟")) {
+      return;
+    }
+
     try {
-      await axios.delete(`${API_URL}/${id}`);
-      toast.success("Deleted");
-      fetchAll();
-    } catch {
-      toast.error("Delete failed");
+      await api.delete(`/CompanyLocation/${id}`);
+
+      toast.success("ځای په بریالیتوب سره حذف شو");
+
+      await fetchAll();
+    } catch (error) {
+      if (error.response?.status === 403) {
+        toast.error("یوازې Owner د حذف کولو اجازه لري");
+        return;
+      }
+
+      toast.error("ځای حذف نه شو");
     }
   };
 
-  // EDIT
-const editItem = (item) => {
-  setForm({
-    id: item.id,
-    companyId: item.company?.id,   // ✅ FIX
-    provincesAndCitiesId: item.provincesAndCities?.id, // ✅ FIX
-  });
+  // ==============================
+  // سمول
+  // یوازې Owner
+  // ==============================
+  const editItem = (item) => {
+    if (!canEdit) {
+      toast.error("یوازې Owner د سمولو اجازه لري");
+      return;
+    }
 
-  setIsEdit(true);
-};
+    setForm({
+      id: item.id,
+      companyId: item.company?.id || "",
+      provincesAndCitiesId:
+        item.provincesAndCities?.id || "",
+    });
 
-  // RESET
+    setIsEdit(true);
+  };
+
+  // ==============================
+  // فورم پاکول
+  // ==============================
   const resetForm = () => {
     setForm({
       id: 0,
@@ -121,112 +243,410 @@ const editItem = (item) => {
     setIsEdit(false);
   };
 
+  // ==============================
+  // د کوچنیو Buttonونو Style
+  // ==============================
+  const smallButtonStyle = {
+    fontSize: "12px",
+    padding: "4px 10px",
+    borderRadius: "5px",
+    fontWeight: "600",
+  };
+
+  // ==============================
+  // Auth Loading
+  // ==============================
+  if (authLoading) {
+    return (
+      <div
+        dir="rtl"
+        style={{
+          backgroundColor: COLORS.light,
+          minHeight: "100vh",
+          padding: "40px",
+          textAlign: "right",
+          color: COLORS.dark,
+          fontWeight: "700",
+        }}
+      >
+        معلومات لوډ کېږي...
+      </div>
+    );
+  }
+
+  // ==============================
+  // CompanyUser
+  // هېڅ اجازه نه لري
+  // ==============================
+  if (isCompanyUser || !canView) {
+    return (
+      <div
+        dir="rtl"
+        style={{
+          backgroundColor: COLORS.light,
+          minHeight: "100vh",
+          padding: "40px",
+          textAlign: "right",
+        }}
+      >
+        <div
+          style={{
+            color: COLORS.dark,
+            fontSize: "18px",
+            fontWeight: "700",
+          }}
+        >
+          تاسو دې پاڼې ته د لاسرسي اجازه نه لرئ.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mt-4">
-      <h2>Company Locations</h2>
+    <div
+      className="container-fluid mt-4 px-4"
+      dir="rtl"
+      style={{
+        backgroundColor: COLORS.light,
+        minHeight: "100vh",
+        paddingTop: "20px",
+        paddingBottom: "30px",
+        textAlign: "right",
+      }}
+    >
+      {/* ==============================
+          سرلیک
+      ============================== */}
+      <h2
+        className="mb-4 fw-bold"
+        style={{
+          color: COLORS.dark,
+          textAlign: "right",
+        }}
+      >
+        د شرکتونو ځایونه
+      </h2>
 
-      <div className="card p-3 mb-3">
-        <div className="row">
-
-          <div className="col-md-5">
-            <select
-              className="form-select"
-              name="companyId"
-              value={form.companyId}
-              onChange={handleChange}
-            >
-              <option value="">Select Company</option>
-
-              {companies.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="col-md-5">
-            <select
-              className="form-select"
-              name="provincesAndCitiesId"
-              value={form.provincesAndCitiesId}
-              onChange={handleChange}
-            >
-              <option value="">Select City</option>
-
-              {cities.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="col-md-2">
-            {isEdit ? (
-              <button
-                className="btn btn-warning w-100"
-                onClick={update}
-              >
-                Update
-              </button>
-            ) : (
-              <button
-                className="btn btn-success w-100"
-                onClick={create}
-              >
-                Add
-              </button>
-            )}
-          </div>
-
+      {/* ==============================
+          فورم
+      ============================== */}
+      <div
+        className="card mb-4 shadow-sm"
+        style={{
+          backgroundColor: COLORS.light,
+          border: "none",
+          borderRadius: "10px",
+        }}
+      >
+        {/* د فورم سرلیک */}
+        <div
+          className="card-header"
+          style={{
+            backgroundColor: COLORS.dark,
+            color: COLORS.light,
+            border: "none",
+            padding: "12px 18px",
+            textAlign: "right",
+          }}
+        >
+          <h5
+            className="mb-0 fw-bold"
+            style={{
+              color: COLORS.light,
+              textAlign: "right",
+            }}
+          >
+            {isEdit
+              ? "د شرکت ځای سمول"
+              : "د شرکت ځای اضافه کول"}
+          </h5>
         </div>
 
-        <button
-          className="btn btn-secondary mt-3"
-          onClick={resetForm}
+        <div
+          className="card-body"
+          style={{
+            backgroundColor: COLORS.light,
+            textAlign: "right",
+          }}
         >
-          Reset
-        </button>
+          <div className="row g-2 justify-content-end">
+            {/* ==============================
+                شرکت
+            ============================== */}
+            <div className="col-md-5">
+              <select
+                className="form-select"
+                name="companyId"
+                value={form.companyId}
+                onChange={handleChange}
+                disabled={isEdit && !canEdit}
+                style={{
+                  backgroundColor: COLORS.light,
+                  color: COLORS.dark,
+                  border: "none",
+                  boxShadow: `0 0 0 1px ${COLORS.dark}`,
+                  textAlign: "right",
+                }}
+              >
+                <option value="">
+                  شرکت وټاکئ
+                </option>
+
+                {companies.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* ==============================
+                ښار
+            ============================== */}
+            <div className="col-md-5">
+              <select
+                className="form-select"
+                name="provincesAndCitiesId"
+                value={form.provincesAndCitiesId}
+                onChange={handleChange}
+                disabled={isEdit && !canEdit}
+                style={{
+                  backgroundColor: COLORS.light,
+                  color: COLORS.dark,
+                  border: "none",
+                  boxShadow: `0 0 0 1px ${COLORS.dark}`,
+                  textAlign: "right",
+                }}
+              >
+                <option value="">
+                  ښار وټاکئ
+                </option>
+
+                {cities.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* ==============================
+                اضافه / نوي کول
+            ============================== */}
+            <div className="col-md-2 d-flex justify-content-start align-items-center">
+              {isEdit ? (
+                canEdit && (
+                  <button
+                    type="button"
+                    className="btn fw-bold"
+                    onClick={update}
+                    style={{
+                      ...smallButtonStyle,
+                      backgroundColor: COLORS.brown,
+                      color: COLORS.light,
+                      border: "none",
+                    }}
+                  >
+                    نوي کول
+                  </button>
+                )
+              ) : (
+                canCreate && (
+                  <button
+                    type="button"
+                    className="btn fw-bold"
+                    onClick={create}
+                    style={{
+                      ...smallButtonStyle,
+                      backgroundColor: COLORS.dark,
+                      color: COLORS.light,
+                      border: "none",
+                    }}
+                  >
+                    اضافه کول
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* ==============================
+              پاکول
+          ============================== */}
+          <div className="mt-3 text-end">
+            <button
+              type="button"
+              className="btn fw-bold"
+              onClick={resetForm}
+              style={{
+                ...smallButtonStyle,
+                backgroundColor: COLORS.brown,
+                color: COLORS.light,
+                border: "none",
+              }}
+            >
+              پاکول
+            </button>
+          </div>
+        </div>
       </div>
 
-      <table className="table table-bordered table-hover">
-        <thead className="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Company</th>
-            <th>City</th>
-            <th width="170">Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {items.map((x) => (
-            <tr key={x.id}>
-              <td>{x.id}</td>
-              <td>{x.company?.name}</td>
-              <td>{x.provincesAndCities?.name}</td>
-
-              <td>
-                <button
-                  className="btn btn-primary btn-sm me-2"
-                  onClick={() => editItem(x)}
+      {/* ==============================
+          جدول
+      ============================== */}
+      <div
+        className="card shadow-sm"
+        style={{
+          backgroundColor: COLORS.light,
+          border: "none",
+          borderRadius: "10px",
+        }}
+      >
+        <div className="card-body p-0">
+          <div className="table-responsive">
+            <table
+              className="table mb-0"
+              style={{
+                backgroundColor: COLORS.light,
+                color: COLORS.dark,
+                textAlign: "right",
+              }}
+            >
+              {/* ==============================
+                  جدول سر
+              ============================== */}
+              <thead>
+                <tr
+                  style={{
+                    backgroundColor: COLORS.dark,
+                  }}
                 >
-                  Edit
-                </button>
+                  <th
+                    style={{
+                      color: COLORS.light,
+                      textAlign: "right",
+                    }}
+                  >
+                    شمېره
+                  </th>
 
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => deleteItem(x.id)}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+                  <th
+                    style={{
+                      color: COLORS.light,
+                      textAlign: "right",
+                    }}
+                  >
+                    شرکت
+                  </th>
 
-      </table>
+                  <th
+                    style={{
+                      color: COLORS.light,
+                      textAlign: "right",
+                    }}
+                  >
+                    ښار
+                  </th>
+
+                  {/* یوازې Owner ته کړنې */}
+                  {isOwner && (
+                    <th
+                      style={{
+                        color: COLORS.light,
+                        textAlign: "right",
+                        width: "180px",
+                      }}
+                    >
+                      کړنې
+                    </th>
+                  )}
+                </tr>
+              </thead>
+
+              {/* ==============================
+                  جدول معلومات
+              ============================== */}
+              <tbody>
+                {items.map((x, index) => (
+                  <tr
+                    key={x.id}
+                    style={{
+                      backgroundColor: COLORS.light,
+                      color: COLORS.dark,
+                    }}
+                  >
+                    <td
+                      style={{
+                        color: COLORS.dark,
+                        textAlign: "right",
+                      }}
+                    >
+                      {index + 1}
+                    </td>
+
+                    <td
+                      style={{
+                        color: COLORS.dark,
+                        fontWeight: "600",
+                        textAlign: "right",
+                      }}
+                    >
+                      {x.company?.name}
+                    </td>
+
+                    <td
+                      style={{
+                        color: COLORS.dark,
+                        fontWeight: "600",
+                        textAlign: "right",
+                      }}
+                    >
+                      {x.provincesAndCities?.name}
+                    </td>
+
+                    {isOwner && (
+                      <td
+                        style={{
+                          textAlign: "right",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className="btn me-1"
+                          onClick={() => editItem(x)}
+                          style={{
+                            ...smallButtonStyle,
+                            backgroundColor: COLORS.dark,
+                            color: COLORS.light,
+                            border: "none",
+                          }}
+                        >
+                          سمول
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn"
+                          onClick={() => deleteItem(x.id)}
+                          style={{
+                            ...smallButtonStyle,
+                            backgroundColor: COLORS.brown,
+                            color: COLORS.light,
+                            border: "none",
+                          }}
+                        >
+                          حذف
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

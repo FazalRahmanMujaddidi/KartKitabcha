@@ -1,0 +1,212 @@
+
+/* ================================
+   REPORT FILTER PAGE
+================================ */
+
+.report-filter-page {
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 20px;
+}
+
+/* ================================
+   FILTER CARD
+================================ */
+
+.report-filter-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e2e6ea;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.report-filter-card .form-label {
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 6px;
+}
+
+.report-filter-card .form-select,
+.report-filter-card .form-control {
+  height: 42px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  transition: all 0.2s ease;
+}
+
+.report-filter-card .form-select:focus,
+.report-filter-card .form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+}
+
+/* ================================
+   DATE PICKER
+================================ */
+
+.report-filter-card .rmdp-container {
+  width: 100%;
+}
+
+.report-filter-card .rmdp-input {
+  width: 100% !important;
+  height: 42px !important;
+  border-radius: 6px !important;
+  border: 1px solid #ced4da !important;
+  padding: 8px 12px !important;
+  font-size: 15px;
+}
+
+.report-filter-card .rmdp-input:focus {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15) !important;
+  outline: none;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+
+.report-filter-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+}
+
+.report-filter-buttons .btn {
+  height: 42px;
+  border-radius: 6px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ================================
+   RESULT COUNT
+================================ */
+
+.report-result-count {
+  background: #ffffff;
+  border-left: 4px solid #0d6efd;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* ================================
+   TABLE
+================================ */
+
+.report-filter-table-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e2e6ea;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.report-filter-table {
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.report-filter-table thead th {
+  background: #212529;
+  color: #ffffff;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 11px 10px;
+}
+
+.report-filter-table tbody td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 9px 10px;
+  white-space: nowrap;
+}
+
+.report-filter-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.report-filter-table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* ================================
+   STATUS BADGES
+================================ */
+
+.report-status-badge {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.report-status-new {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.report-status-renew {
+  background: #fff3cd;
+  color: #664d03;
+}
+
+.report-status-lost {
+  background: #f8d7da;
+  color: #842029;
+}
+
+/* ================================
+   EMPTY / LOADING
+================================ */
+
+.report-empty {
+  padding: 30px !important;
+  color: #6c757d;
+  font-size: 15px;
+  text-align: center;
+}
+
+.report-loading {
+  padding: 30px !important;
+  color: #0d6efd;
+  font-size: 15px;
+  text-align: center;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+  .report-filter-page {
+    padding: 10px;
+  }
+
+  .report-filter-card {
+    padding: 12px !important;
+  }
+
+  .report-filter-buttons {
+    width: 100%;
+  }
+
+  .report-filter-buttons .btn {
+    flex: 1;
+  }
+
+  .report-filter-table {
+    font-size: 13px;
+  }
+
+  .report-filter-table thead th,
+  .report-filter-table tbody td {
+    padding: 7px;
+  }
+}
+

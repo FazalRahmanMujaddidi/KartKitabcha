@@ -1,10 +1,28 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
 
-const API_URL = "http://localhost:5256/api/Vehicle";
+const COLORS = {
+  dark: "#343148",
+  light: "#cdc6bd",
+  brown: "#583432",
+};
 
 export default function VehiclePage() {
+  const { hasRole } = useAuth();
+
+  const isOwner = hasRole("Owner");
+  const isSimpleUser = hasRole("SimpleUser");
+  const isCompanyUser = hasRole("CompanyUser");
+
+  // SimpleUser یوازې Save کولی شي
+  const canCreate = isOwner || isSimpleUser;
+
+  // یوازې Owner edit/delete کولی شي
+  const canEdit = isOwner;
+  const canDelete = isOwner;
+
   const [vehicles, setVehicles] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -13,12 +31,16 @@ export default function VehiclePage() {
     type: "",
   });
 
+  // =========================
+  // وسایط ترلاسه کول
+  // =========================
   const fetchVehicles = async () => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await api.get("/Vehicle");
       setVehicles(res.data);
-    } catch {
-      toast.error("Failed to load vehicles");
+    } catch (error) {
+      console.error("Vehicle GET Error:", error);
+      toast.error("د وسایطو معلومات ترلاسه نه شول");
     }
   };
 
@@ -26,6 +48,9 @@ export default function VehiclePage() {
     fetchVehicles();
   }, []);
 
+  // =========================
+  // د فورم بدلون
+  // =========================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -33,53 +58,125 @@ export default function VehiclePage() {
     });
   };
 
+  // =========================
+  // اضافه کول
+  // =========================
   const createVehicle = async () => {
+    if (!canCreate) {
+      toast.error("تاسو د اضافه کولو اجازه نه لرئ");
+      return;
+    }
+
     if (!form.type.trim()) {
-      toast.warning("Vehicle type is required");
+      toast.warning("د وسیلې ډول اړین دی");
       return;
     }
 
     try {
-      await axios.post(API_URL, form);
-      toast.success("Vehicle created");
+      await api.post("/Vehicle", {
+        type: form.type,
+      });
 
-      fetchVehicles();
+      toast.success("وسیله په بریالیتوب سره اضافه شوه");
+
+      await fetchVehicles();
       resetForm();
-    } catch {
-      toast.error("Failed to create");
+    } catch (error) {
+      console.error("Vehicle POST Error:", error);
+
+      const message =
+        error.response?.data?.message ||
+        "وسیله اضافه نه شوه";
+
+      toast.error(message);
     }
   };
 
+  // =========================
+  // نوي کول
+  // =========================
   const updateVehicle = async () => {
+    if (!canEdit) {
+      toast.error("یوازې Owner کولی شي وسیله سم کړي");
+      return;
+    }
+
+    if (!form.type.trim()) {
+      toast.warning("د وسیلې ډول اړین دی");
+      return;
+    }
+
     try {
-      await axios.put(`${API_URL}/${form.id}`, form);
+      await api.put(`/Vehicle/${form.id}`, {
+        id: form.id,
+        type: form.type,
+      });
 
-      toast.success("Vehicle updated");
+      toast.success("وسیله په بریالیتوب سره نوي شوه");
 
-      fetchVehicles();
+      await fetchVehicles();
       resetForm();
-    } catch {
-      toast.error("Update failed");
+    } catch (error) {
+      console.error("Vehicle PUT Error:", error);
+
+      const message =
+        error.response?.data?.message ||
+        "د وسیلې نوي کول ناکام شول";
+
+      toast.error(message);
     }
   };
 
+  // =========================
+  // حذف کول
+  // =========================
   const deleteVehicle = async (id) => {
+    if (!canDelete) {
+      toast.error("یوازې Owner کولی شي وسیله حذف کړي");
+      return;
+    }
+
+    if (!window.confirm("ایا غواړئ دا وسیله حذف کړئ؟")) {
+      return;
+    }
+
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await api.delete(`/Vehicle/${id}`);
 
-      toast.success("Vehicle deleted");
+      toast.success("وسیله په بریالیتوب سره حذف شوه");
 
-      fetchVehicles();
-    } catch {
-      toast.error("Delete failed");
+      await fetchVehicles();
+    } catch (error) {
+      console.error("Vehicle DELETE Error:", error);
+
+      const message =
+        error.response?.data?.message ||
+        "د وسیلې حذف کول ناکام شول";
+
+      toast.error(message);
     }
   };
 
-  const editVehicle = (v) => {
-    setForm(v);
+  // =========================
+  // سمول
+  // =========================
+  const editVehicle = (vehicle) => {
+    if (!canEdit) {
+      toast.error("یوازې Owner کولی شي وسیله سم کړي");
+      return;
+    }
+
+    setForm({
+      id: vehicle.id,
+      type: vehicle.type || "",
+    });
+
     setIsEdit(true);
   };
 
+  // =========================
+  // پاکول
+  // =========================
   const resetForm = () => {
     setForm({
       id: 0,
@@ -89,108 +186,325 @@ export default function VehiclePage() {
     setIsEdit(false);
   };
 
-  return (
-    <div className="container mt-4">
+  // =========================
+  // کوچنۍ تڼۍ
+  // =========================
+  const smallButtonStyle = {
+    fontSize: "12px",
+    padding: "4px 10px",
+    borderRadius: "5px",
+    fontWeight: "600",
+  };
 
-      <h2 className="text-primary mb-4">
-        Vehicle Management
+  return (
+    <div
+      className="container-fluid mt-4 px-4"
+      dir="rtl"
+      style={{
+        backgroundColor: COLORS.light,
+        minHeight: "100vh",
+        paddingTop: "20px",
+        paddingBottom: "30px",
+        textAlign: "right",
+      }}
+    >
+      {/* =========================
+          سرلیک
+      ========================= */}
+      <h2
+        className="mb-4 fw-bold"
+        style={{
+          color: COLORS.dark,
+          textAlign: "right",
+        }}
+      >
+        د وسایطو مدیریت
       </h2>
 
-      <div className="card shadow-sm mb-4">
-        <div className="card-header bg-primary text-white">
-          Vehicle Form
+      {/* =========================
+          فورم
+          CompanyUser ته نه ښکاري
+      ========================= */}
+      {canCreate && (
+        <div
+          className="card mb-4 shadow-sm"
+          style={{
+            backgroundColor: COLORS.light,
+            border: "none",
+            borderRadius: "10px",
+          }}
+        >
+          <div
+            className="card-header"
+            style={{
+              backgroundColor: COLORS.dark,
+              color: COLORS.light,
+              border: "none",
+              padding: "12px 18px",
+              textAlign: "right",
+            }}
+          >
+            <h5
+              className="mb-0 fw-bold"
+              style={{
+                color: COLORS.light,
+                textAlign: "right",
+              }}
+            >
+              {isEdit
+                ? "د وسیلې سمول"
+                : "د وسیلې اضافه کول"}
+            </h5>
+          </div>
+
+          <div
+            className="card-body"
+            style={{
+              backgroundColor: COLORS.light,
+              textAlign: "right",
+            }}
+          >
+            <div className="row g-2 justify-content-end">
+
+              {/* د وسیلې ډول */}
+              <div className="col-12 mb-2">
+                <input
+                  className="form-control"
+                  name="type"
+                  placeholder="د وسیلې ډول"
+                  value={form.type}
+                  onChange={handleChange}
+                  style={{
+                    backgroundColor: COLORS.light,
+                    color: COLORS.dark,
+                    border: "none",
+                    boxShadow: `0 0 0 1px ${COLORS.dark}`,
+                    textAlign: "right",
+                  }}
+                />
+              </div>
+
+              {/* تڼۍ */}
+              <div className="col-12 d-flex justify-content-start gap-2">
+
+                {isEdit && canEdit ? (
+                  <button
+                    type="button"
+                    className="btn fw-bold"
+                    onClick={updateVehicle}
+                    style={{
+                      ...smallButtonStyle,
+                      backgroundColor: COLORS.brown,
+                      color: COLORS.light,
+                      border: "none",
+                    }}
+                  >
+                    نوي کول
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn fw-bold"
+                    onClick={createVehicle}
+                    style={{
+                      ...smallButtonStyle,
+                      backgroundColor: COLORS.dark,
+                      color: COLORS.light,
+                      border: "none",
+                    }}
+                  >
+                    اضافه کول
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  className="btn fw-bold"
+                  onClick={resetForm}
+                  style={{
+                    ...smallButtonStyle,
+                    backgroundColor: COLORS.brown,
+                    color: COLORS.light,
+                    border: "none",
+                  }}
+                >
+                  پاکول
+                </button>
+
+              </div>
+            </div>
+          </div>
         </div>
-
-<div className="card-body">
-  <div className="row">
-
-    <div className="col-12 mb-3">
-      <input
-        className="form-control"
-        name="type"
-        placeholder="Vehicle Type"
-        value={form.type}
-        onChange={handleChange}
-      />
-    </div>
-
-    <div className="col-6">
-      {isEdit ? (
-        <button
-          className="btn btn-warning w-100"
-          onClick={updateVehicle}
-        >
-          Update
-        </button>
-      ) : (
-        <button
-          className="btn btn-success w-100"
-          onClick={createVehicle}
-        >
-          Create
-        </button>
       )}
-    </div>
 
-    <div className="col-6">
-      <button
-        className="btn btn-secondary w-100"
-        onClick={resetForm}
+      {/* =========================
+          د وسایطو لست
+      ========================= */}
+      <div
+        className="card shadow-sm"
+        style={{
+          backgroundColor: COLORS.light,
+          border: "none",
+          borderRadius: "10px",
+        }}
       >
-        Reset
-      </button>
-    </div>
-
-  </div>
-</div>
-      </div>
-
-      <div className="card shadow-sm">
-        <div className="card-header bg-dark text-white">
-          Vehicle List
+        <div
+          className="card-header"
+          style={{
+            backgroundColor: COLORS.dark,
+            color: COLORS.light,
+            border: "none",
+            padding: "12px 18px",
+            textAlign: "right",
+          }}
+        >
+          <h5
+            className="mb-0 fw-bold"
+            style={{
+              color: COLORS.light,
+              textAlign: "right",
+            }}
+          >
+            د وسایطو لست
+          </h5>
         </div>
 
-        <div className="card-body">
+        <div
+          className="card-body p-0"
+          style={{
+            backgroundColor: COLORS.light,
+          }}
+        >
+          <div className="table-responsive">
+            <table
+              className="table mb-0"
+              style={{
+                backgroundColor: COLORS.light,
+                color: COLORS.dark,
+                textAlign: "right",
+              }}
+            >
+              <thead>
+                <tr
+                  style={{
+                    backgroundColor: COLORS.dark,
+                  }}
+                >
+                  <th
+                    style={{
+                      color: COLORS.light,
+                      textAlign: "right",
+                    }}
+                  >
+                    شمېره
+                  </th>
 
-          <table className="table table-bordered table-hover">
-            <thead className="table-primary">
-              <tr>
-                <th>ID</th>
-                <th>Vehicle Type</th>
-                <th width="180">Actions</th>
-              </tr>
-            </thead>
+                  <th
+                    style={{
+                      color: COLORS.light,
+                      textAlign: "right",
+                    }}
+                  >
+                    د وسیلې ډول
+                  </th>
 
-            <tbody>
-              {vehicles.map((v) => (
-                <tr key={v.id}>
-                  <td>{v.id}</td>
-                  <td>{v.type}</td>
-
-                  <td>
-                    <button
-                      className="btn btn-primary btn-sm me-2"
-                      onClick={() => editVehicle(v)}
+                  {/* CompanyUser ته Actions نه ښکاري */}
+                  {(canEdit || canDelete) && (
+                    <th
+                      style={{
+                        color: COLORS.light,
+                        textAlign: "right",
+                        width: "180px",
+                      }}
                     >
-                      Edit
-                    </button>
-
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => deleteVehicle(v.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+                      کړنې
+                    </th>
+                  )}
                 </tr>
-              ))}
+              </thead>
 
-            </tbody>
-          </table>
+              <tbody>
+                {vehicles.map((v, index) => (
+                  <tr
+                    key={v.id}
+                    style={{
+                      backgroundColor: COLORS.light,
+                      color: COLORS.dark,
+                    }}
+                  >
+                    <td
+                      style={{
+                        color: COLORS.dark,
+                        textAlign: "right",
+                      }}
+                    >
+                      {index + 1}
+                    </td>
 
+                    <td
+                      style={{
+                        color: COLORS.dark,
+                        fontWeight: "600",
+                        textAlign: "right",
+                      }}
+                    >
+                      {v.type}
+                    </td>
+
+                    {/* یوازې Owner */}
+                    {(canEdit || canDelete) && (
+                      <td
+                        style={{
+                          textAlign: "right",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {canEdit && (
+                          <button
+                            type="button"
+                            className="btn me-1"
+                            onClick={() =>
+                              editVehicle(v)
+                            }
+                            style={{
+                              ...smallButtonStyle,
+                              backgroundColor:
+                                COLORS.dark,
+                              color: COLORS.light,
+                              border: "none",
+                            }}
+                          >
+                            سمول
+                          </button>
+                        )}
+
+                        {canDelete && (
+                          <button
+                            type="button"
+                            className="btn"
+                            onClick={() =>
+                              deleteVehicle(v.id)
+                            }
+                            style={{
+                              ...smallButtonStyle,
+                              backgroundColor:
+                                COLORS.brown,
+                              color: COLORS.light,
+                              border: "none",
+                            }}
+                          >
+                            حذف
+                          </button>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-
     </div>
   );
 }
