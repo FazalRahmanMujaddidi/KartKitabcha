@@ -56,6 +56,7 @@ namespace KartKitabch.Controllers
                     company.Name,
                     company.MyProperty,
                     company.CompanyTon,
+                    company.OldRecordCount,
                     company.CompanyPlace,
                     company.CompanyCategory,
 
@@ -174,42 +175,6 @@ namespace KartKitabch.Controllers
             );
         }
 
-        // // PUT: api/company/5
-        // [HttpPut("{id:int}")]
-        // public async Task<IActionResult> Update(int id, Company company)
-        // {
-        //     if (id != company.Id)
-        //         return BadRequest("ID mismatch");
-
-        //     var existing = await _context.Companies.FindAsync(id);
-
-        //     if (existing == null)
-        //         return NotFound();
-
-        //     existing.Name = company.Name;
-        //     existing.MyProperty = company.MyProperty;
-        //     existing.CompanyTon = company.CompanyTon;
-        //     existing.CompanyPlace = company.CompanyPlace;
-        //     existing.CompanyCategory = company.CompanyCategory;
-
-        //     // These settings can be changed from Company page.
-        //     // ExtraReportBatches is intentionally NOT changed here.
-        //     // It is controlled only by AllowAdding.
-        //     existing.IsAddingClosed = company.IsAddingClosed;
-        //     existing.AutoCloseEnabled = company.AutoCloseEnabled;
-
-        //     try
-        //     {
-        //         await _context.SaveChangesAsync();
-        //     }
-        //     catch (DbUpdateConcurrencyException)
-        //     {
-        //         return StatusCode(500, "Error updating company");
-        //     }
-
-        //     return NoContent();
-        // }
-        // PUT: api/company/5
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, Company company)
         {
@@ -228,6 +193,7 @@ namespace KartKitabch.Controllers
             existing.CompanyTon = company.CompanyTon;
             existing.CompanyPlace = company.CompanyPlace;
             existing.CompanyCategory = company.CompanyCategory;
+            existing.OldRecordCount = company.OldRecordCount;
 
             // Company-level settings
             // ExtraReportBatches is intentionally NOT changed here.
@@ -281,66 +247,130 @@ namespace KartKitabch.Controllers
             return NoContent();
         }
         // GET: api/company/details/5
-        [HttpGet("details/{id:int}")]
-        public async Task<IActionResult> Details(int id)
+        // [HttpGet("details/{id:int}")]
+        // public async Task<IActionResult> Details(int id)
+        // {
+        //     var company = await _context.Companies
+        //         .Where(c => c.Id == id)
+        //         .Select(c => new
+        //         {
+        //             c.Id,
+        //             c.Name,
+
+        //             MyProperty = c.MyProperty.ToString(),
+        //             CompanyTon = c.CompanyTon.ToString(),
+
+        //             GeneralCount = _context.Report.Count(r =>
+        //                 r.CompanyId == c.Id &&
+        //                 r.DestinationProvinceId == null
+        //             ),
+
+        //             GeneralVehicleTypes = _context.Report
+        //                 .Where(r =>
+        //                     r.CompanyId == c.Id &&
+        //                     r.DestinationProvinceId == null
+        //                 )
+        //                 .Select(r => r.Vehicle.Type)
+        //                 .Distinct()
+        //                 .ToList(),
+
+        //             Locations = c.CompanyLocations
+        //                 .Select(l => new
+        //                 {
+        //                     l.Id,
+
+        //                     CityId = l.ProvincesAndCitiesId,
+
+        //                     CityName = l.ProvincesAndCities.Name,
+
+        //                     DestinationCount = _context.Report.Count(r =>
+        //                         r.CompanyId == c.Id &&
+        //                         r.DestinationProvinceId == l.ProvincesAndCitiesId
+        //                     ),
+
+        //                     VehicleTypes = _context.Report
+        //                         .Where(r =>
+        //                             r.CompanyId == c.Id &&
+        //                             r.DestinationProvinceId == l.ProvincesAndCitiesId
+        //                         )
+        //                         .Select(r => r.Vehicle.Type)
+        //                         .Distinct()
+        //                         .ToList()
+        //                 })
+        //                 .ToList()
+        //         })
+        //         .FirstOrDefaultAsync();
+
+        //     if (company == null)
+        //         return NotFound();
+
+        //     return Ok(company);
+        // }
+
+[HttpGet("details/{id:int}")]
+public async Task<IActionResult> Details(int id)
+{
+    var company = await _context.Companies
+        .Where(c => c.Id == id)
+        .Select(c => new
         {
-            var company = await _context.Companies
-                .Where(c => c.Id == id)
-                .Select(c => new
+            c.Id,
+            c.Name,
+
+            c.OldRecordCount,
+
+            MyProperty = c.MyProperty.ToString(),
+            CompanyTon = c.CompanyTon.ToString(),
+
+            GeneralCount = _context.Report.Count(r =>
+                r.CompanyId == c.Id &&
+                r.DestinationProvinceId == null
+            ),
+
+            GeneralVehicleTypes = _context.Report
+                .Where(r =>
+                    r.CompanyId == c.Id &&
+                    r.DestinationProvinceId == null
+                )
+                .Select(r => r.Vehicle.Type)
+                .Distinct()
+                .ToList(),
+
+            Locations = c.CompanyLocations
+                .Select(l => new
                 {
-                    c.Id,
-                    c.Name,
+                    l.Id,
 
-                    MyProperty = c.MyProperty.ToString(),
-                    CompanyTon = c.CompanyTon.ToString(),
+                    CityId = l.ProvincesAndCitiesId,
 
-                    GeneralCount = _context.Report.Count(r =>
+                    CityName = l.ProvincesAndCities.Name,
+
+                    DestinationCount = _context.Report.Count(r =>
                         r.CompanyId == c.Id &&
-                        r.DestinationProvinceId == null
+                        r.DestinationProvinceId == l.ProvincesAndCitiesId
                     ),
 
-                    GeneralVehicleTypes = _context.Report
+                    OldLocationRecordCount =
+                        l.OldLocationRecordCount,
+
+                    VehicleTypes = _context.Report
                         .Where(r =>
                             r.CompanyId == c.Id &&
-                            r.DestinationProvinceId == null
+                            r.DestinationProvinceId == l.ProvincesAndCitiesId
                         )
                         .Select(r => r.Vehicle.Type)
                         .Distinct()
-                        .ToList(),
-
-                    Locations = c.CompanyLocations
-                        .Select(l => new
-                        {
-                            l.Id,
-
-                            CityId = l.ProvincesAndCitiesId,
-
-                            CityName = l.ProvincesAndCities.Name,
-
-                            DestinationCount = _context.Report.Count(r =>
-                                r.CompanyId == c.Id &&
-                                r.DestinationProvinceId == l.ProvincesAndCitiesId
-                            ),
-
-                            VehicleTypes = _context.Report
-                                .Where(r =>
-                                    r.CompanyId == c.Id &&
-                                    r.DestinationProvinceId == l.ProvincesAndCitiesId
-                                )
-                                .Select(r => r.Vehicle.Type)
-                                .Distinct()
-                                .ToList()
-                        })
                         .ToList()
                 })
-                .FirstOrDefaultAsync();
+                .ToList()
+        })
+        .FirstOrDefaultAsync();
 
-            if (company == null)
-                return NotFound();
+    if (company == null)
+        return NotFound();
 
-            return Ok(company);
-        }
-
+    return Ok(company);
+}
         // DELETE: api/company/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)

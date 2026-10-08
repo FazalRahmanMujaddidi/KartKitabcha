@@ -355,8 +355,7 @@ export default function ReportFilter() {
         location.LocationName ||
         location.provincesAndCities?.name ||
         location.ProvincesAndCities?.Name ||
-        `موقعیت ${
-          location.id ?? location.Id
+        `موقعیت ${location.id ?? location.Id
         }`,
     }));
   }, [
@@ -740,7 +739,7 @@ export default function ReportFilter() {
       paletNumber: "",
       companyId:
         isCompanyUser &&
-        currentUser?.companyId
+          currentUser?.companyId
           ? Number(currentUser.companyId)
           : 0,
       gpsCompanyId: 0,
@@ -824,7 +823,100 @@ export default function ReportFilter() {
       complete,
     };
   }, [reports]);
+  // const oldRecordTotal = useMemo(() => {
+  //   const companyOldRecords = new Map();
 
+  //   reports.forEach((report) => {
+  //     const companyId =
+  //       report.companyId ??
+  //       report.CompanyId ??
+  //       0;
+
+  //     const oldCount = Number(
+  //       report.oldRecordCount ??
+  //       report.OldRecordCount ??
+  //       0
+  //     );
+
+  //     if (companyId && !companyOldRecords.has(companyId)) {
+  //       companyOldRecords.set(companyId, oldCount);
+  //     }
+  //   });
+
+  //   return Array.from(companyOldRecords.values()).reduce(
+  //     (sum, count) => sum + count,
+  //     0
+  //   );
+  // }, [reports]);
+  const oldRecordTotal = useMemo(() => {
+    const companyOldRecords = new Map();
+    const locationOldRecords = new Map();
+
+    reports.forEach((report) => {
+      const companyId =
+        report.companyId ??
+        report.CompanyId ??
+        0;
+
+      const oldCompanyCount = Number(
+        report.oldRecordCount ??
+        report.OldRecordCount ??
+        0
+      );
+
+      if (
+        companyId &&
+        !companyOldRecords.has(companyId)
+      ) {
+        companyOldRecords.set(
+          companyId,
+          oldCompanyCount
+        );
+      }
+
+      const isDestination = Boolean(
+        report.isDestination ??
+        report.IsDestination ??
+        false
+      );
+
+      const locationId =
+        report.companyLocationId ??
+        report.CompanyLocationId ??
+        0;
+
+      const locationOldCount = Number(
+        report.locationOldRecordCount ??
+        report.LocationOldRecordCount ??
+        0
+      );
+
+      if (
+        isDestination &&
+        locationId &&
+        !locationOldRecords.has(locationId)
+      ) {
+        locationOldRecords.set(
+          locationId,
+          locationOldCount
+        );
+      }
+    });
+
+    const companyOldTotal =
+      Array.from(companyOldRecords.values()).reduce(
+        (sum, count) => sum + count,
+        0
+      );
+
+    const locationOldTotal =
+      Array.from(locationOldRecords.values()).reduce(
+        (sum, count) => sum + count,
+        0
+      );
+
+    return companyOldTotal + locationOldTotal;
+  }, [reports]);
   if (
     !currentUser &&
     localStorage.getItem("token")
@@ -1377,6 +1469,8 @@ export default function ReportFilter() {
 
             {/* REPORT COUNT */}
 
+            {/* REPORT COUNT */}
+
             <span
               className="badge"
               style={{
@@ -1386,7 +1480,7 @@ export default function ReportFilter() {
                 padding: "6px 10px",
               }}
             >
-              {reports.length} راپورونه
+              {reports.length + oldRecordTotal} راپورونه
             </span>
 
             {/* EXCEL BUTTON */}
@@ -1409,14 +1503,14 @@ export default function ReportFilter() {
                 fontWeight: "600",
                 cursor:
                   excelLoading ||
-                  loading ||
-                  reports.length === 0
+                    loading ||
+                    reports.length === 0
                     ? "not-allowed"
                     : "pointer",
                 opacity:
                   excelLoading ||
-                  loading ||
-                  reports.length === 0
+                    loading ||
+                    reports.length === 0
                     ? 0.6
                     : 1,
                 whiteSpace: "nowrap",

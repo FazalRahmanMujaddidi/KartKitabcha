@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-// const API_URL = "http://localhost:5256/api/GPSCompany";
-const API_URL = "/api/GPSCompany";
+ const API_URL = "http://localhost:5256/api/GPSCompany";
+// const API_URL = "/api/GPSCompany";
 
 // یوازې درې رنګونه
 const COLORS = {

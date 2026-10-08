@@ -1,3 +1,5 @@
+
+
 // import React, { useEffect, useMemo, useState } from "react";
 // import DatePickerModule from "react-multi-date-picker";
 // import persian from "react-date-object/calendars/persian";
@@ -82,6 +84,7 @@
 //   });
 
 //   const [loading, setLoading] = useState(false);
+
 //   const toPersianDigits = (value) => {
 //     return String(value)
 //       .replace(/0/g, "۰")
@@ -96,23 +99,9 @@
 //       .replace(/9/g, "۹");
 //   };
 
-
-//   // const years = useMemo(() => {
-//   //   const currentYear = Number(currentPersianYear);
-
-//   //   if (!Number.isFinite(currentYear)) {
-//   //     return [];
-//   //   }
-
-//   //   return Array.from(
-//   //     { length: 10 },
-//   //     (_, index) => currentYear - index
-//   //   ).filter((yearItem) =>
-//   //     Number.isFinite(yearItem)
-//   //   );
-//   // }, [currentPersianYear]);
 //   const years = useMemo(() => {
 //     const currentYear = Number(currentPersianYear);
+
 //     if (!Number.isFinite(currentYear)) return [];
 
 //     return Array.from(
@@ -120,6 +109,7 @@
 //       (_, index) => currentYear - index
 //     );
 //   }, [currentPersianYear]);
+
 //   const fetchFinanceReport = async () => {
 //     try {
 //       setLoading(true);
@@ -134,7 +124,7 @@
 //         params.month = Number(month);
 //       }
 
-//       if (month && Number.isFinite(Number(year))) {
+//       if (Number.isFinite(Number(year))) {
 //         params.year = Number(year);
 //       }
 
@@ -355,7 +345,6 @@
 //             >
 //               کال
 //             </label>
-
 //             <select
 //               value={
 //                 Number.isFinite(Number(year))
@@ -379,7 +368,6 @@
 //                 padding: "4px 8px",
 //                 backgroundColor: COLORS.light,
 //                 color: COLORS.dark,
-//                 opacity: month ? 1 : 0.6,
 //                 textAlign: "right",
 //                 direction: "rtl",
 //               }}
@@ -458,7 +446,7 @@
 //                 cursor: "pointer",
 //               }}
 //             >
-//               فلټر پاکول
+//               پاکول
 //             </button>
 //           </div>
 //         </div>
@@ -854,8 +842,10 @@ export default function FinanceReport() {
   const [report, setReport] = useState({
     oneCount: 0,
     threeCount: 0,
+    mosnaCount: 0,
     oneAmount: 0,
     threeAmount: 0,
+    mosnaAmount: 0,
     totalCount: 0,
     totalAmount: 0,
     daily: [],
@@ -918,8 +908,10 @@ export default function FinanceReport() {
       setReport({
         oneCount: response.data?.oneCount || 0,
         threeCount: response.data?.threeCount || 0,
+        mosnaCount: response.data?.mosnaCount || 0,
         oneAmount: response.data?.oneAmount || 0,
         threeAmount: response.data?.threeAmount || 0,
+        mosnaAmount: response.data?.mosnaAmount || 0,
         totalCount: response.data?.totalCount || 0,
         totalAmount: response.data?.totalAmount || 0,
         daily: Array.isArray(response.data?.daily)
@@ -935,8 +927,10 @@ export default function FinanceReport() {
       setReport({
         oneCount: 0,
         threeCount: 0,
+        mosnaCount: 0,
         oneAmount: 0,
         threeAmount: 0,
+        mosnaAmount: 0,
         totalCount: 0,
         totalAmount: 0,
         daily: [],
@@ -1147,7 +1141,6 @@ export default function FinanceReport() {
                 padding: "4px 8px",
                 backgroundColor: COLORS.light,
                 color: COLORS.dark,
-                opacity: month ? 1 : 0.6,
                 textAlign: "right",
                 direction: "rtl",
               }}
@@ -1226,7 +1219,7 @@ export default function FinanceReport() {
                 cursor: "pointer",
               }}
             >
-               پاکول
+              پاکول
             </button>
           </div>
         </div>
@@ -1316,6 +1309,45 @@ export default function FinanceReport() {
             }}
           >
             {formatMoney(report.threeAmount)} افغانۍ
+          </div>
+        </div>
+
+        <div
+          style={{
+            backgroundColor: COLORS.dark,
+            borderRadius: "6px",
+            padding: "14px",
+            textAlign: "right",
+          }}
+        >
+          <div
+            style={{
+              color: COLORS.light,
+              fontSize: "13px",
+              marginBottom: "7px",
+            }}
+          >
+            مثنی کارت
+          </div>
+
+          <div
+            style={{
+              color: COLORS.light,
+              fontSize: "20px",
+              fontWeight: "700",
+            }}
+          >
+            {formatNumber(report.mosnaCount)}
+          </div>
+
+          <div
+            style={{
+              color: COLORS.light,
+              fontSize: "12px",
+              marginTop: "5px",
+            }}
+          >
+            {formatMoney(report.mosnaAmount)} افغانۍ
           </div>
         </div>
 
@@ -1498,6 +1530,26 @@ export default function FinanceReport() {
                       color: COLORS.light,
                     }}
                   >
+                    مثنی
+                  </th>
+
+                  <th
+                    style={{
+                      padding: "8px",
+                      textAlign: "right",
+                      color: COLORS.light,
+                    }}
+                  >
+                    د مثنی مبلغ
+                  </th>
+
+                  <th
+                    style={{
+                      padding: "8px",
+                      textAlign: "right",
+                      color: COLORS.light,
+                    }}
+                  >
                     ټول
                   </th>
                 </tr>
@@ -1524,6 +1576,14 @@ export default function FinanceReport() {
 
                     <td style={{ padding: "8px" }}>
                       {formatMoney(item.threeAmount)}
+                    </td>
+
+                    <td style={{ padding: "8px" }}>
+                      {formatNumber(item.mosnaCount)}
+                    </td>
+
+                    <td style={{ padding: "8px" }}>
+                      {formatMoney(item.mosnaAmount)}
                     </td>
 
                     <td

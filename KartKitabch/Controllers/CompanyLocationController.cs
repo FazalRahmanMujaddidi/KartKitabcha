@@ -18,7 +18,6 @@ namespace KartKitabch.Controllers
         }
 
         // GET: api/CompanyLocation
-
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -31,12 +30,24 @@ namespace KartKitabch.Controllers
                     id = x.Id,
                     companyId = x.CompanyId,
                     provincesAndCitiesId = x.ProvincesAndCitiesId,
-                    name = x.ProvincesAndCities != null
-                        ? x.ProvincesAndCities.Name
-                        : null,
-                    companyName = x.Company != null
-                        ? x.Company.Name
-                        : null,
+                    oldLocationRecordCount = x.OldLocationRecordCount,
+
+                    company = x.Company == null
+                        ? null
+                        : new
+                        {
+                            id = x.Company.Id,
+                            name = x.Company.Name
+                        },
+
+                    provincesAndCities = x.ProvincesAndCities == null
+                        ? null
+                        : new
+                        {
+                            id = x.ProvincesAndCities.Id,
+                            name = x.ProvincesAndCities.Name
+                        },
+
                     extraReportBatches = x.ExtraReportBatches,
                     isAddingClosed = x.IsAddingClosed,
                     autoCloseEnabled = x.AutoCloseEnabled
@@ -45,8 +56,7 @@ namespace KartKitabch.Controllers
 
             return Ok(locations);
         }
-
-        // GET: api/CompanyLocation/5
+        // GET: api/CompanyLocation/
         [HttpGet("{id}")]
         public async Task<ActionResult<CompanyLocation>> GetById(int id)
         {
@@ -68,7 +78,8 @@ namespace KartKitabch.Controllers
             var model = new CompanyLocation
             {
                 CompanyId = dto.CompanyId,
-                ProvincesAndCitiesId = dto.ProvincesAndCitiesId
+                ProvincesAndCitiesId = dto.ProvincesAndCitiesId,
+                OldLocationRecordCount = dto.OldLocationRecordCount
             };
 
             _context.CompanyLocations.Add(model);
@@ -88,7 +99,7 @@ namespace KartKitabch.Controllers
 
             item.CompanyId = dto.CompanyId;
             item.ProvincesAndCitiesId = dto.ProvincesAndCitiesId;
-
+            item.OldLocationRecordCount = dto.OldLocationRecordCount;
             await _context.SaveChangesAsync();
 
             return NoContent();

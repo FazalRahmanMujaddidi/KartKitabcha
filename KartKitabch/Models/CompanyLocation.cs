@@ -15,7 +15,7 @@ namespace KartKitabch.Models
         public int ProvincesAndCitiesId { get; set; }
 
         public ProvincesAndCities ProvincesAndCities { get; set; } = null!;
-
+        public int? OldLocationRecordCount { get; set; } = 0;
         public int ExtraReportBatches { get; set; } = 0;
 
         public bool IsAddingClosed { get; set; } = false;

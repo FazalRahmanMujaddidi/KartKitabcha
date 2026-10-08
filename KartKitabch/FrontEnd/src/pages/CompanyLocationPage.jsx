@@ -34,6 +34,7 @@ export default function CompanyLocationPage() {
   const [form, setForm] = useState({
     id: 0,
     companyId: "",
+    oldLocationRecordCount: 0,
     provincesAndCitiesId: "",
   });
 
@@ -129,6 +130,8 @@ export default function CompanyLocationPage() {
       await api.post("/CompanyLocation", {
         companyId: form.companyId,
         provincesAndCitiesId: form.provincesAndCitiesId,
+
+        oldLocationRecordCount: Number(form.oldLocationRecordCount || 0),
       });
 
       toast.success("ځای په بریالیتوب سره اضافه شو");
@@ -164,6 +167,7 @@ export default function CompanyLocationPage() {
       await api.put(`/CompanyLocation/${form.id}`, {
         companyId: form.companyId,
         provincesAndCitiesId: form.provincesAndCitiesId,
+        oldLocationRecordCount: Number(form.oldLocationRecordCount || 0),
       });
 
       toast.success("ځای په بریالیتوب سره نوي شو");
@@ -225,6 +229,7 @@ export default function CompanyLocationPage() {
       companyId: item.company?.id || "",
       provincesAndCitiesId:
         item.provincesAndCities?.id || "",
+      oldLocationRecordCount: item.oldLocationRecordCount ?? 0,
     });
 
     setIsEdit(true);
@@ -238,6 +243,7 @@ export default function CompanyLocationPage() {
       id: 0,
       companyId: "",
       provincesAndCitiesId: "",
+      oldLocationRecordCount: 0,
     });
 
     setIsEdit(false);
@@ -369,28 +375,45 @@ export default function CompanyLocationPage() {
             textAlign: "right",
           }}
         >
-          <div className="row g-2 justify-content-end">
-            {/* ==============================
+          <div
+            className="row g-3 justify-content-start"
+            style={{
+              direction: "rtl",
+              textAlign: "right",
+            }}
+          >
+            {/* شرکت */}
+            <div className="col-md-4">
+              <label
+                htmlFor="companyId"
+                style={{
+                  display: "block",
+                  color: COLORS.dark,
+                  fontWeight: "700",
+                  fontSize: "14px",
+                  marginBottom: "6px",
+                  textAlign: "right",
+                }}
+              >
                 شرکت
-            ============================== */}
-            <div className="col-md-5">
+              </label>
+
               <select
+                id="companyId"
                 className="form-select"
                 name="companyId"
                 value={form.companyId}
                 onChange={handleChange}
-                disabled={isEdit && !canEdit}
                 style={{
                   backgroundColor: COLORS.light,
                   color: COLORS.dark,
                   border: "none",
                   boxShadow: `0 0 0 1px ${COLORS.dark}`,
                   textAlign: "right",
+                  height: "42px",
                 }}
               >
-                <option value="">
-                  شرکت وټاکئ
-                </option>
+                <option value="">شرکت وټاکئ</option>
 
                 {companies.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -400,27 +423,38 @@ export default function CompanyLocationPage() {
               </select>
             </div>
 
-            {/* ==============================
+            {/* ښار */}
+            <div className="col-md-4">
+              <label
+                htmlFor="provincesAndCitiesId"
+                style={{
+                  display: "block",
+                  color: COLORS.dark,
+                  fontWeight: "700",
+                  fontSize: "14px",
+                  marginBottom: "6px",
+                  textAlign: "right",
+                }}
+              >
                 ښار
-            ============================== */}
-            <div className="col-md-5">
+              </label>
+
               <select
+                id="provincesAndCitiesId"
                 className="form-select"
                 name="provincesAndCitiesId"
                 value={form.provincesAndCitiesId}
                 onChange={handleChange}
-                disabled={isEdit && !canEdit}
                 style={{
                   backgroundColor: COLORS.light,
                   color: COLORS.dark,
                   border: "none",
                   boxShadow: `0 0 0 1px ${COLORS.dark}`,
                   textAlign: "right",
+                  height: "42px",
                 }}
               >
-                <option value="">
-                  ښار وټاکئ
-                </option>
+                <option value="">ښار وټاکئ</option>
 
                 {cities.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -430,44 +464,99 @@ export default function CompanyLocationPage() {
               </select>
             </div>
 
-            {/* ==============================
-                اضافه / نوي کول
-            ============================== */}
-            <div className="col-md-2 d-flex justify-content-start align-items-center">
-              {isEdit ? (
-                canEdit && (
-                  <button
-                    type="button"
-                    className="btn fw-bold"
-                    onClick={update}
-                    style={{
-                      ...smallButtonStyle,
-                      backgroundColor: COLORS.brown,
-                      color: COLORS.light,
-                      border: "none",
-                    }}
-                  >
-                    نوي کول
-                  </button>
-                )
-              ) : (
-                canCreate && (
-                  <button
-                    type="button"
-                    className="btn fw-bold"
-                    onClick={create}
-                    style={{
-                      ...smallButtonStyle,
-                      backgroundColor: COLORS.dark,
-                      color: COLORS.light,
-                      border: "none",
-                    }}
-                  >
-                    اضافه کول
-                  </button>
-                )
-              )}
+            {/* زاړه راپورونه */}
+            <div className="col-md-4">
+              <label
+                htmlFor="oldLocationRecordCount"
+                style={{
+                  display: "block",
+                  color: COLORS.dark,
+                  fontWeight: "700",
+                  fontSize: "14px",
+                  marginBottom: "6px",
+                  textAlign: "right",
+                }}
+              >
+                زاړه راپورونه
+              </label>
+
+              <input
+                id="oldLocationRecordCount"
+                type="number"
+                min="0"
+                name="oldLocationRecordCount"
+                value={form.oldLocationRecordCount}
+                onChange={handleChange}
+                placeholder="د زړو راپورونو شمېر"
+                style={{
+                  width: "100%",
+                  height: "42px",
+                  backgroundColor: COLORS.light,
+                  color: COLORS.dark,
+                  border: "none",
+                  boxShadow: `0 0 0 1px ${COLORS.dark}`,
+                  borderRadius: "6px",
+                  padding: "8px 12px",
+                  textAlign: "right",
+                }}
+              />
             </div>
+          </div>
+
+          {/* Buttons */}
+          <div
+            className="mt-3 d-flex justify-content-start gap-2"
+            style={{
+              direction: "rtl",
+            }}
+          >
+            {isEdit ? (
+              canEdit && (
+                <button
+                  type="button"
+                  className="btn fw-bold"
+                  onClick={update}
+                  style={{
+                    ...smallButtonStyle,
+                    backgroundColor: COLORS.brown,
+                    color: COLORS.light,
+                    border: "none",
+                  }}
+                >
+                  نوي کول
+                </button>
+              )
+            ) : (
+              canCreate && (
+                <button
+                  type="button"
+                  className="btn fw-bold"
+                  onClick={create}
+                  style={{
+                    ...smallButtonStyle,
+                    backgroundColor: COLORS.dark,
+                    color: COLORS.light,
+                    border: "none",
+                  }}
+                >
+                  اضافه کول
+                </button>
+              )
+            )}
+
+            <button
+              type="button"
+              className="btn fw-bold"
+              onClick={resetForm}
+              style={{
+                ...smallButtonStyle,
+                backgroundColor: COLORS.brown,
+                color: COLORS.light,
+                border: "none",
+              }}
+            >
+              پاکول
+            </button>
           </div>
 
           {/* ==============================

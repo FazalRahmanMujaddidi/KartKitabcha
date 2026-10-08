@@ -16,7 +16,7 @@
         public int ExtraReportBatches { get; set; } = 0;
         public bool IsAddingClosed { get; set; } = false;
         public bool AutoCloseEnabled { get; set; } = true;
-
+        public int? OldRecordCount { get; set; }
         public List<CompanyLocation> CompanyLocations { get; set; } = new();
 
         public List<Report> Report { get; set; } = new();
@@ -41,8 +41,8 @@
         بنادرسرحدی = 1,
         مراکزولایات = 2,
         والسوالی = 3,
-        ولایت_والسوالی_مقصد_بس=4,
-        ولایت_والسوالی_مقصد_تکسی =5,
+        ولایت_والسوالی_مقصد_بس = 4,
+        ولایت_والسوالی_مقصد_تکسی = 5,
 
 
     }

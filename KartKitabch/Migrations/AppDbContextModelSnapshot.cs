@@ -134,6 +134,9 @@ namespace KartKitabch.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("OldRecordCount")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Companies");
@@ -158,6 +161,9 @@ namespace KartKitabch.Migrations
 
                     b.Property<bool>("IsAddingClosed")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("OldLocationRecordCount")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProvincesAndCitiesId")
                         .HasColumnType("int");
