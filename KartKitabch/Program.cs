@@ -2,53 +2,40 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
 using KartKitabch.Data;
 using KartKitabch.Models;
-
 using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// =====================================================
+// ============================================================
 // DATABASE
-// =====================================================
+// ============================================================
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 
-
-// =====================================================
-// ASP.NET CORE IDENTITY
-// =====================================================
+// ============================================================
+// IDENTITY
+// ============================================================
 
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>
     {
-        // -------------------------------------------------
         // PASSWORD
-        // -------------------------------------------------
-
         options.Password.RequiredLength = 6;
         options.Password.RequireDigit = false;
         options.Password.RequireLowercase = false;
         options.Password.RequireUppercase = false;
         options.Password.RequireNonAlphanumeric = false;
 
-        // -------------------------------------------------
         // USER / EMAIL
-        // -------------------------------------------------
-
         options.User.RequireUniqueEmail = true;
 
-        // -------------------------------------------------
         // LOCKOUT
-        // -------------------------------------------------
-
         options.Lockout.AllowedForNewUsers = true;
         options.Lockout.MaxFailedAccessAttempts = 5;
         options.Lockout.DefaultLockoutTimeSpan =
@@ -59,10 +46,9 @@ builder.Services
     .AddDefaultTokenProviders()
     .AddSignInManager();
 
-
-// =====================================================
-// JWT AUTHENTICATION
-// =====================================================
+// ============================================================
+// JWT SETTINGS
+// ============================================================
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 
@@ -91,6 +77,9 @@ if (string.IsNullOrWhiteSpace(jwtAudience))
     );
 }
 
+// ============================================================
+// AUTHENTICATION
+// ============================================================
 
 builder.Services
     .AddAuthentication(options =>
@@ -112,7 +101,6 @@ builder.Services
                 ValidateIssuerSigningKey = true,
 
                 ValidIssuer = jwtIssuer,
-
                 ValidAudience = jwtAudience,
 
                 IssuerSigningKey =
@@ -124,17 +112,15 @@ builder.Services
             };
     });
 
-
-// =====================================================
+// ============================================================
 // AUTHORIZATION
-// =====================================================
+// ============================================================
 
 builder.Services.AddAuthorization();
 
-
-// =====================================================
+// ============================================================
 // CONTROLLERS
-// =====================================================
+// ============================================================
 
 builder.Services
     .AddControllers()
@@ -144,10 +130,9 @@ builder.Services
             ReferenceHandler.IgnoreCycles;
     });
 
-
-// =====================================================
+// ============================================================
 // CORS
-// =====================================================
+// ============================================================
 
 builder.Services.AddCors(options =>
 {
@@ -160,33 +145,47 @@ builder.Services.AddCors(options =>
     });
 });
 
-
-// =====================================================
-// BUILD
-// =====================================================
+// ============================================================
+// BUILD APP
+// ============================================================
 
 var app = builder.Build();
 
-
-// =====================================================
+// ============================================================
 // HTTP PIPELINE
-// =====================================================
+// ============================================================
 
 app.UseRouting();
 
 app.UseCors("AllowAll");
 
-// Authentication must come before Authorization
 app.UseAuthentication();
 
 app.UseAuthorization();
 
+// ============================================================
+// REACT STATIC FILES
+// ============================================================
+
+app.UseDefaultFiles();
+
+app.UseStaticFiles();
+
+// ============================================================
+// API CONTROLLERS
+// ============================================================
+
 app.MapControllers();
 
+// ============================================================
+// REACT ROUTING FALLBACK
+// ============================================================
 
-// =====================================================
+app.MapFallbackToFile("index.html");
+
+// ============================================================
 // SEED ROLES + INITIAL OWNER
-// =====================================================
+// ============================================================
 
 using (var scope = app.Services.CreateScope())
 {
@@ -198,10 +197,9 @@ using (var scope = app.Services.CreateScope())
     var userManager =
         services.GetRequiredService<UserManager<ApplicationUser>>();
 
-
-    // =================================================
+    // ========================================================
     // CREATE ROLES
-    // =================================================
+    // ========================================================
 
     string[] roles =
     {
@@ -239,10 +237,9 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-
-    // =================================================
+    // ========================================================
     // INITIAL OWNER SETTINGS
-    // =================================================
+    // ========================================================
 
     var ownerUserName =
         builder.Configuration["InitialOwner:UserName"];
@@ -255,7 +252,6 @@ using (var scope = app.Services.CreateScope())
 
     var ownerPassword =
         builder.Configuration["InitialOwner:Password"];
-
 
     if (string.IsNullOrWhiteSpace(ownerUserName))
     {
@@ -278,20 +274,18 @@ using (var scope = app.Services.CreateScope())
         );
     }
 
-
-    // =================================================
+    // ========================================================
     // FIND OWNER
-    // =================================================
+    // ========================================================
 
     var owner =
         await userManager.FindByNameAsync(
             ownerUserName
         );
 
-
-    // =================================================
+    // ========================================================
     // CREATE OWNER IF NOT EXISTS
-    // =================================================
+    // ========================================================
 
     if (owner == null)
     {
@@ -300,21 +294,16 @@ using (var scope = app.Services.CreateScope())
             UserName = ownerUserName,
             Email = ownerEmail,
             FullName = ownerFullName ?? "System Owner",
-
             IsActive = true,
-
             EmailConfirmed = true,
-
             CreatedAt = DateTime.UtcNow
         };
-
 
         var createResult =
             await userManager.CreateAsync(
                 owner,
                 ownerPassword
             );
-
 
         if (!createResult.Succeeded)
         {
@@ -330,17 +319,11 @@ using (var scope = app.Services.CreateScope())
             );
         }
 
-
-        // ---------------------------------------------
-        // ADD OWNER ROLE
-        // ---------------------------------------------
-
         var ownerRoleResult =
             await userManager.AddToRoleAsync(
                 owner,
                 "Owner"
             );
-
 
         if (!ownerRoleResult.Succeeded)
         {
@@ -356,7 +339,6 @@ using (var scope = app.Services.CreateScope())
             );
         }
 
-
         Console.WriteLine(
             "=============================================="
         );
@@ -371,9 +353,9 @@ using (var scope = app.Services.CreateScope())
     }
     else
     {
-        // =================================================
-        // OWNER ALREADY EXISTS
-        // =================================================
+        // ====================================================
+        // MAKE SURE EXISTING OWNER HAS OWNER ROLE
+        // ====================================================
 
         if (!await userManager.IsInRoleAsync(
                 owner,
@@ -400,7 +382,6 @@ using (var scope = app.Services.CreateScope())
             }
         }
 
-
         Console.WriteLine(
             "=============================================="
         );
@@ -415,9 +396,8 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-
-// =====================================================
-// RUN
-// =====================================================
+// ============================================================
+// START APPLICATION
+// ============================================================
 
 app.Run();

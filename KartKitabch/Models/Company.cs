@@ -9,6 +9,13 @@
         public CompanyType MyProperty { get; set; }
 
         public CompanyTon CompanyTon { get; set; }
+        public CompanyPlace CompanyPlace { get; set; }
+        public CompanyCategory CompanyCategory { get; set; }
+
+        // Record control
+        public int ExtraReportBatches { get; set; } = 0;
+        public bool IsAddingClosed { get; set; } = false;
+        public bool AutoCloseEnabled { get; set; } = true;
 
         public List<CompanyLocation> CompanyLocations { get; set; } = new();
 
@@ -22,10 +29,30 @@
         باربری = 3
     }
 
-    public enum CompanyTon
+    public enum CompanyPlace
     {
-        متوسط = 1,
-        بلند = 2
+        مرکزیت = 1,
+        نمایندګی = 2,
+        قراردادی = 3
     }
 
+    public enum CompanyCategory
+    {
+        بنادرسرحدی = 1,
+        مراکزولایات = 2,
+        والسوالی = 3,
+        ولایت_والسوالی_مقصد_بس=4,
+        ولایت_والسوالی_مقصد_تکسی =5,
+
+
+    }
+
+    public enum CompanyTon
+    {
+        باربری_متوسط = 1,
+        باربری_بلند = 2,
+        مسافربری = 3,
+        باربری_شهری = 4,
+        مسافربری_شهری = 5
+    }
 }

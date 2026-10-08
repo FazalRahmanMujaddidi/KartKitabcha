@@ -255,3 +255,82 @@ VALUES (N'20261002141013_AddUsers', N'10.0.12');
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261006014536_InitialCreate', N'10.0.12');
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261006020206_InitialCreate1', N'10.0.12');
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+ALTER TABLE [Companies] ADD [CompanyPlace] int NOT NULL DEFAULT 0;
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261006174014_sfffg', N'10.0.12');
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261006175349_sfffgd', N'10.0.12');
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+ALTER TABLE [Companies] ADD [CompanyCategory] int NOT NULL DEFAULT 0;
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261006175611_sfffgdf', N'10.0.12');
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+ALTER TABLE [Companies] ADD [AutoCloseEnabled] bit NOT NULL DEFAULT CAST(0 AS bit);
+
+ALTER TABLE [Companies] ADD [ExtraReportBatches] int NOT NULL DEFAULT 0;
+
+ALTER TABLE [Companies] ADD [IsAddingClosed] bit NOT NULL DEFAULT CAST(0 AS bit);
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261007040322_AddReportControlToCompany', N'10.0.12');
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+ALTER TABLE [CompanyLocations] ADD [AutoCloseEnabled] bit NOT NULL DEFAULT CAST(0 AS bit);
+
+ALTER TABLE [CompanyLocations] ADD [ExtraReportBatches] int NOT NULL DEFAULT 0;
+
+ALTER TABLE [CompanyLocations] ADD [IsAddingClosed] bit NOT NULL DEFAULT CAST(0 AS bit);
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261007072756_AddCompanyLocationBatchControl', N'10.0.12');
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261007113535_InitialCreatedd', N'10.0.12');
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261007113848_InitialCreateddd', N'10.0.12');
+
+COMMIT;
+GO
+

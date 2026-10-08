@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { useAuth } from "../context/AuthContext";
-
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -28,7 +27,7 @@ export default function Login() {
     e.preventDefault();
 
     if (!form.userName.trim() || !form.password) {
-      toast.error("د کارن نوم او پاسورډ ولیکئ");
+      toast.error("د کارنوونکی نوم او پاسورډ ولیکئ");
       return;
     }
 
@@ -43,7 +42,7 @@ export default function Login() {
     } catch (error) {
       const message =
         error.response?.data?.message ||
-        "د کارن نوم یا پاسورډ ستونزه ده";
+        "د کارنونکی نوم یا پاسورډ ستونزه ده";
 
       toast.error(message);
     } finally {
@@ -75,7 +74,7 @@ export default function Login() {
           {/* Username */}
           <div className="login-form-group">
             <label htmlFor="userName">
-              کارن نوم
+              کارونکی نوم
             </label>
 
             <div className="login-input-wrapper">
@@ -89,7 +88,7 @@ export default function Login() {
                 name="userName"
                 value={form.userName}
                 onChange={change}
-                placeholder="خپل کارن نوم ولیکئ"
+                placeholder="خپل کارونکی نوم ولیکئ"
                 autoComplete="username"
                 disabled={loading}
               />

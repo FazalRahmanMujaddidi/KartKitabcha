@@ -1,4 +1,3 @@
-
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -12,17 +11,10 @@ export default function Header() {
 
   const { user, loading, logout } = useAuth();
 
-  if (loading) {
+  if (loading || !user) {
     return null;
   }
 
-  if (!user) {
-    return null;
-  }
-
-  // ---------------------------------
-  // Get roles safely
-  // ---------------------------------
   const roles = Array.isArray(user.roles)
     ? user.roles
     : user.role
@@ -33,10 +25,9 @@ export default function Header() {
   const isSimpleUser = roles.includes("SimpleUser");
   const isCompanyUser = roles.includes("CompanyUser");
 
-  // Owner + SimpleUser
-  const canSeeMainMenu = isOwner || isSimpleUser;
+  const canSeeMainMenu =
+    isOwner || isSimpleUser;
 
-  // Only Owner
   const canSeeUsers = isOwner;
 
   const navLinkStyle = {
@@ -78,14 +69,6 @@ export default function Header() {
     whiteSpace: "nowrap",
   };
 
-  const roleName = isOwner
-    ? "مالک"
-    : isSimpleUser
-      ? "ساده کاروونکی"
-      : isCompanyUser
-        ? "د شرکت کاروونکی"
-        : "";
-
   return (
     <nav
       className="navbar navbar-expand-lg"
@@ -93,10 +76,13 @@ export default function Header() {
       style={{
         backgroundColor: COLORS.dark,
         color: COLORS.light,
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
+        width: "100%",
       }}
     >
       <div className="container">
-
         {/* Logo */}
         <NavLink
           className="navbar-brand fw-bold"
@@ -135,13 +121,9 @@ export default function Header() {
           className="collapse navbar-collapse"
           id="navbarNav"
         >
-
-          {/* =====================================
-              OWNER + SIMPLE USER
-          ===================================== */}
+          {/* OWNER + SIMPLE USER */}
           {canSeeMainMenu && (
             <ul className="navbar-nav me-auto">
-
               {/* کور */}
               <li className="nav-item">
                 <NavLink
@@ -253,7 +235,18 @@ export default function Header() {
                 </NavLink>
               </li>
 
-              {/* کاروونکی - ONLY OWNER */}
+              {/* مالي راپور - Owner + SimpleUser */}
+              <li className="nav-item">
+                <NavLink
+                  className="nav-link"
+                  to="/finance-report"
+                  style={navLinkStyle}
+                >
+                  مالي راپور
+                </NavLink>
+              </li>
+
+              {/* Users - Owner only */}
               {canSeeUsers && (
                 <li className="nav-item">
                   <NavLink
@@ -265,96 +258,12 @@ export default function Header() {
                   </NavLink>
                 </li>
               )}
-
-              {/* مکتوب
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  style={navLinkStyle}
-                >
-                  مکتوب
-                </a>
-
-                <ul
-                  className="dropdown-menu"
-                  style={dropdownStyle}
-                >
-                  <li>
-                    <NavLink
-                      className="dropdown-item"
-                      to="/officecontent"
-                      style={dropdownItemStyle}
-                    >
-                      دفتر
-                    </NavLink>
-                  </li>
-
-                  <li>
-                    <NavLink
-                      className="dropdown-item"
-                      to="/sender"
-                      style={dropdownItemStyle}
-                    >
-                      لېږونکی
-                    </NavLink>
-                  </li>
-
-                  <li>
-                    <NavLink
-                      className="dropdown-item"
-                      to="/person"
-                      style={dropdownItemStyle}
-                    >
-                      شخص
-                    </NavLink>
-                  </li>
-
-                  <li>
-                    <NavLink
-                      className="dropdown-item"
-                      to="/lettercontent"
-                      style={dropdownItemStyle}
-                    >
-                      د مکتوب محتوا
-                    </NavLink>
-                  </li>
-
-                  <li>
-                    <NavLink
-                      className="dropdown-item"
-                      to="/letter"
-                      style={dropdownItemStyle}
-                    >
-                      مکتوب
-                    </NavLink>
-                  </li>
-
-                  <li>
-                    <NavLink
-                      className="dropdown-item"
-                      to="/maktob"
-                      style={dropdownItemStyle}
-                    >
-                      مکتوب
-                    </NavLink>
-                  </li>
-                </ul>
-              </li> */}
-
             </ul>
           )}
 
-          {/* =====================================
-              COMPANY USER
-              ONLY HOME
-          ===================================== */}
+          {/* COMPANY USER */}
           {isCompanyUser && (
             <ul className="navbar-nav me-auto">
-
               <li className="nav-item">
                 <NavLink
                   className="nav-link"
@@ -364,13 +273,10 @@ export default function Header() {
                   کور
                 </NavLink>
               </li>
-
             </ul>
           )}
 
-          {/* =====================================
-              USER + LOGOUT
-          ===================================== */}
+          {/* FULL NAME + LOGOUT */}
           <div
             className="d-flex align-items-center gap-2 mt-2 mt-lg-0"
             style={{
@@ -381,24 +287,15 @@ export default function Header() {
               style={{
                 color: COLORS.light,
                 fontSize: "13px",
+                fontWeight: "600",
                 whiteSpace: "nowrap",
               }}
             >
-              {user.fullName || user.userName}
+              {user?.fullName ||
+                user?.FullName ||
+                user?.userName ||
+                "کارن"}
             </span>
-
-            {roleName && (
-              <span
-                style={{
-                  color: COLORS.light,
-                  fontSize: "11px",
-                  opacity: 0.8,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                ({roleName})
-              </span>
-            )}
 
             <button
               type="button"
@@ -408,14 +305,8 @@ export default function Header() {
               وتل
             </button>
           </div>
-
         </div>
       </div>
     </nav>
   );
 }
-
-
-
-
-

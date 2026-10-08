@@ -663,6 +663,7 @@ export default function ProvincesAndCitiesPage() {
                   ))
                 )}
               </tbody>
+           
             </table>
           </div>
         </div>

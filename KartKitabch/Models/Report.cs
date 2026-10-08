@@ -39,11 +39,12 @@ namespace KartKitabch.Models
         public string DateS { get; set; }
 
         public string? Chasis { get; set; }
+        public int? LostPrice { get; set; }
     }
     public enum KartDuration
     {
         یو = 1,
-        دری = 2
+        دری = 2,
     }
 
     public enum TypeOfKart

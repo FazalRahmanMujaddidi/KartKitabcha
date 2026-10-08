@@ -1,91 +1,4 @@
 
-// import React, { createContext, useContext, useEffect, useState } from "react";
-// import api from "../services/api";
-
-// const AuthContext = createContext(null);
-
-// export function AuthProvider({ children }) {
-//   const [user, setUser] = useState(null);
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     const token = localStorage.getItem("token");
-
-//     if (!token) {
-//       setLoading(false);
-//       return;
-//     }
-
-//     api
-//       .get("/Auth/me")
-//       .then((res) => {
-//         setUser(res.data);
-//         localStorage.setItem("user", JSON.stringify(res.data));
-//       })
-//       .catch(() => {
-//         localStorage.removeItem("token");
-//         localStorage.removeItem("user");
-//         setUser(null);
-//       })
-//       .finally(() => {
-//         setLoading(false);
-//       });
-//   }, []);
-
-//   const login = async (userName, password) => {
-//     const res = await api.post("/Auth/login", {
-//       userName,
-//       password,
-//     });
-
-//     localStorage.setItem("token", res.data.token);
-//     localStorage.setItem("user", JSON.stringify(res.data));
-
-//     setUser(res.data);
-
-//     return res.data;
-//   };
-
-//   const logout = () => {
-//     localStorage.removeItem("token");
-//     localStorage.removeItem("user");
-//     setUser(null);
-//     window.location.href = "/login";
-//   };
-
-//   const hasRole = (role) => {
-//     if (!user) return false;
-
-//     if (Array.isArray(user.roles)) {
-//       return user.roles.includes(role);
-//     }
-
-//     if (user.role) {
-//       return user.role === role;
-//     }
-
-//     return false;
-//   };
-
-//   return (
-//     <AuthContext.Provider
-//       value={{
-//         user,
-//         loading,
-//         login,
-//         logout,
-//         hasRole,
-//       }}
-//     >
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// }
-
-// export function useAuth() {
-//   return useContext(AuthContext);
-// }
-
 import React, {
   createContext,
   useContext,
@@ -139,27 +52,22 @@ function getUserRoles(user) {
 
   let roles = [];
 
-  // roles: ["Owner"]
   if (Array.isArray(user.roles)) {
     roles.push(...user.roles);
   }
 
-  // role: "Owner"
   if (typeof user.role === "string") {
     roles.push(user.role);
   }
 
-  // Role: "Owner"
   if (typeof user.Role === "string") {
     roles.push(user.Role);
   }
 
-  // Roles: ["Owner"]
   if (Array.isArray(user.Roles)) {
     roles.push(...user.Roles);
   }
 
-  // Remove empty values and duplicates
   return [
     ...new Set(
       roles
@@ -170,9 +78,13 @@ function getUserRoles(user) {
 }
 
 // -----------------------------------------
-// Add roles from JWT if API doesn't return them
+// Add roles from JWT
 // -----------------------------------------
 function addTokenRoles(user, token) {
+  if (!user) {
+    user = {};
+  }
+
   if (!token) {
     return user;
   }
@@ -221,6 +133,37 @@ function addTokenRoles(user, token) {
   };
 }
 
+// -----------------------------------------
+// Normalize API user
+// -----------------------------------------
+function normalizeUser(data) {
+  if (!data) {
+    return null;
+  }
+
+  // API response:
+  // {
+  //   message: "...",
+  //   token: "...",
+  //   roles: [...],
+  //   user: {
+  //      fullName: "Fazal Rahman Mosazai"
+  //   }
+  // }
+  if (data.user) {
+    return {
+      ...data.user,
+      roles:
+        data.user.roles ||
+        data.roles ||
+        [],
+    };
+  }
+
+  // If API directly returns user
+  return data;
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -239,19 +182,11 @@ export function AuthProvider({ children }) {
     api
       .get("/Auth/me")
       .then((res) => {
+        const apiUser = normalizeUser(res.data);
+
         const userWithRoles = addTokenRoles(
-          res.data,
+          apiUser,
           token
-        );
-
-        console.log(
-          "AUTH USER:",
-          userWithRoles
-        );
-
-        console.log(
-          "AUTH ROLES:",
-          getUserRoles(userWithRoles)
         );
 
         setUser(userWithRoles);
@@ -262,13 +197,14 @@ export function AuthProvider({ children }) {
         );
       })
       .catch((error) => {
-        console.error(
-          "Auth /me error:",
-          error
-        );
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        // Invalid/expired token.
+        // Handle silently.
+        if (error.response?.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+          return;
+        }
 
         setUser(null);
       })
@@ -300,33 +236,47 @@ export function AuthProvider({ children }) {
       );
     }
 
+    // ---------------------------------------
+    // Save token FIRST
+    // ---------------------------------------
     localStorage.setItem(
       "token",
       token
     );
 
-    // Add roles from response + JWT
+    // ---------------------------------------
+    // Get actual user
+    // ---------------------------------------
+    const apiUser = normalizeUser(
+      res.data
+    );
+
+    if (!apiUser) {
+      throw new Error(
+        "User information was not returned from server."
+      );
+    }
+
+    // ---------------------------------------
+    // Add roles from API + JWT
+    // ---------------------------------------
     const loggedInUser =
       addTokenRoles(
-        res.data,
+        apiUser,
         token
       );
 
-    console.log(
-      "LOGIN USER:",
-      loggedInUser
-    );
-
-    console.log(
-      "LOGIN ROLES:",
-      getUserRoles(loggedInUser)
-    );
-
+    // ---------------------------------------
+    // Save complete user
+    // ---------------------------------------
     localStorage.setItem(
       "user",
       JSON.stringify(loggedInUser)
     );
 
+    // ---------------------------------------
+    // Update React state
+    // ---------------------------------------
     setUser(loggedInUser);
 
     return loggedInUser;
@@ -341,7 +291,7 @@ export function AuthProvider({ children }) {
 
     setUser(null);
 
-    window.location.href = "/login";
+    window.location.href = "/#/login";
   };
 
   // -----------------------------------------

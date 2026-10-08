@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const API_URL = "http://localhost:5256/api/GPSCompany";
+// const API_URL = "http://localhost:5256/api/GPSCompany";
+const API_URL = "/api/GPSCompany";
 
 // یوازې درې رنګونه
 const COLORS = {
@@ -431,13 +432,9 @@ export default function GPSCompany() {
               {/* ==================================================
                   جدول معلومات
               ================================================== */}
-
               <tbody>
-
                 {gps.length === 0 ? (
-
                   <tr>
-
                     <td
                       colSpan="3"
                       style={{
@@ -450,13 +447,9 @@ export default function GPSCompany() {
                     >
                       هېڅ جی پي ایس شرکت ونه موندل شو
                     </td>
-
                   </tr>
-
                 ) : (
-
                   gps.map((v, index) => (
-
                     <tr
                       key={v.id}
                       style={{
@@ -464,9 +457,9 @@ export default function GPSCompany() {
                         color: COLORS.dark,
                       }}
                     >
-
                       <td
                         style={{
+                          backgroundColor: COLORS.light,
                           color: COLORS.dark,
                           textAlign: "right",
                           border: "none",
@@ -477,6 +470,7 @@ export default function GPSCompany() {
 
                       <td
                         style={{
+                          backgroundColor: COLORS.light,
                           color: COLORS.dark,
                           fontWeight: "600",
                           textAlign: "right",
@@ -488,13 +482,13 @@ export default function GPSCompany() {
 
                       <td
                         style={{
+                          backgroundColor: COLORS.light,
+                          color: COLORS.dark,
                           textAlign: "right",
                           whiteSpace: "nowrap",
                           border: "none",
                         }}
                       >
-                        {/* سمول */}
-
                         <button
                           type="button"
                           className="btn me-1"
@@ -509,8 +503,6 @@ export default function GPSCompany() {
                           سمول
                         </button>
 
-                        {/* حذف */}
-
                         <button
                           type="button"
                           className="btn"
@@ -524,15 +516,10 @@ export default function GPSCompany() {
                         >
                           حذف
                         </button>
-
                       </td>
-
                     </tr>
-
                   ))
-
                 )}
-
               </tbody>
             </table>
 

@@ -18,13 +18,32 @@ namespace KartKitabch.Controllers
         }
 
         // GET: api/CompanyLocation
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CompanyLocation>>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return await _context.CompanyLocations
+            var locations = await _context.CompanyLocations
                 .Include(x => x.Company)
                 .Include(x => x.ProvincesAndCities)
+                .AsNoTracking()
+                .Select(x => new
+                {
+                    id = x.Id,
+                    companyId = x.CompanyId,
+                    provincesAndCitiesId = x.ProvincesAndCitiesId,
+                    name = x.ProvincesAndCities != null
+                        ? x.ProvincesAndCities.Name
+                        : null,
+                    companyName = x.Company != null
+                        ? x.Company.Name
+                        : null,
+                    extraReportBatches = x.ExtraReportBatches,
+                    isAddingClosed = x.IsAddingClosed,
+                    autoCloseEnabled = x.AutoCloseEnabled
+                })
                 .ToListAsync();
+
+            return Ok(locations);
         }
 
         // GET: api/CompanyLocation/5

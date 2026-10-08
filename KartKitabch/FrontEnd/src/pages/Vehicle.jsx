@@ -422,7 +422,6 @@ export default function VehiclePage() {
                   )}
                 </tr>
               </thead>
-
               <tbody>
                 {vehicles.map((v, index) => (
                   <tr
@@ -435,41 +434,42 @@ export default function VehiclePage() {
                     <td
                       style={{
                         color: COLORS.dark,
+                        backgroundColor: COLORS.light,
                         textAlign: "right",
+                        border: "none",
                       }}
                     >
                       {index + 1}
                     </td>
-
                     <td
                       style={{
                         color: COLORS.dark,
+                        backgroundColor: COLORS.light,
                         fontWeight: "600",
                         textAlign: "right",
+                        border: "none",
                       }}
                     >
                       {v.type}
                     </td>
-
-                    {/* یوازې Owner */}
                     {(canEdit || canDelete) && (
                       <td
                         style={{
+                          color: COLORS.dark,
+                          backgroundColor: COLORS.light,
                           textAlign: "right",
                           whiteSpace: "nowrap",
+                          border: "none",
                         }}
                       >
                         {canEdit && (
                           <button
                             type="button"
                             className="btn me-1"
-                            onClick={() =>
-                              editVehicle(v)
-                            }
+                            onClick={() => editVehicle(v)}
                             style={{
                               ...smallButtonStyle,
-                              backgroundColor:
-                                COLORS.dark,
+                              backgroundColor: COLORS.dark,
                               color: COLORS.light,
                               border: "none",
                             }}
@@ -477,18 +477,14 @@ export default function VehiclePage() {
                             سمول
                           </button>
                         )}
-
                         {canDelete && (
                           <button
                             type="button"
                             className="btn"
-                            onClick={() =>
-                              deleteVehicle(v.id)
-                            }
+                            onClick={() => deleteVehicle(v.id)}
                             style={{
                               ...smallButtonStyle,
-                              backgroundColor:
-                                COLORS.brown,
+                              backgroundColor: COLORS.brown,
                               color: COLORS.light,
                               border: "none",
                             }}

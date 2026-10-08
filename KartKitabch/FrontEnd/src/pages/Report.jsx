@@ -139,8 +139,8 @@
 //     backgroundColor: state.isSelected
 //       ? COLORS.brown
 //       : state.isFocused
-//       ? COLORS.dark
-//       : COLORS.light,
+//         ? COLORS.dark
+//         : COLORS.light,
 
 //     color:
 //       state.isSelected || state.isFocused
@@ -185,31 +185,16 @@
 //   const isOwner = hasRole("Owner");
 //   const isSimpleUser = hasRole("SimpleUser");
 //   const isCompanyUser = hasRole("CompanyUser");
-
-//   // Owner:
-//   // اضافه + سمول + حذف
-//   //
-//   // SimpleUser:
-//   // اضافه
-//   //
-//   // CompanyUser:
-//   // یوازې لیدل
-
 //   const canCreate = isOwner || isSimpleUser;
+//   const [currentUser, setCurrentUser] = useState(null);
 //   const canEdit = isOwner;
 //   const canDelete = isOwner;
 //   const canManage = canCreate || canEdit || canDelete;
 
-//   // =========================================================
 //   // REPORTS
-//   // =========================================================
-
 //   const [reports, setReports] = useState([]);
 
-//   // =========================================================
 //   // DROPDOWNS
-//   // =========================================================
-
 //   const [companies, setCompanies] = useState([]);
 //   const [gpsCompanies, setGpsCompanies] = useState([]);
 //   const [cities, setCities] = useState([]);
@@ -586,7 +571,7 @@
 
 //       toast.error(
 //         err.response?.data?.message ||
-//           "د راپور اضافه کولو کې ستونزه رامنځته شوه"
+//         "د راپور اضافه کولو کې ستونزه رامنځته شوه"
 //       );
 //     } finally {
 //       setSaving(false);
@@ -679,7 +664,7 @@
 
 //       toast.error(
 //         err.response?.data?.message ||
-//           "د راپور نوي کولو کې ستونزه رامنځته شوه"
+//         "د راپور نوي کولو کې ستونزه رامنځته شوه"
 //       );
 //     } finally {
 //       setSaving(false);
@@ -726,7 +711,7 @@
 
 //       toast.error(
 //         err.response?.data?.message ||
-//           "د راپور حذف کولو کې ستونزه رامنځته شوه"
+//         "د راپور حذف کولو کې ستونزه رامنځته شوه"
 //       );
 //     } finally {
 //       setSaving(false);
@@ -1004,21 +989,6 @@
 //           >
 //             د راپورونو مدیریت
 //           </h2>
-
-//           <small
-//             style={{
-//               color: COLORS.brown,
-//               fontWeight: "600",
-//             }}
-//           >
-//             {isOwner
-//               ? "Owner"
-//               : isSimpleUser
-//               ? "SimpleUser"
-//               : isCompanyUser
-//               ? "CompanyUser"
-//               : ""}
-//           </small>
 //         </div>
 
 //         <div
@@ -1166,7 +1136,7 @@
 //               </select>
 //             </div>
 
-//             {/* CITY */}
+//             {/* PALET */}
 
 //             <div className="col-md-3">
 //               <label
@@ -1176,7 +1146,37 @@
 //                   textAlign: "right",
 //                 }}
 //               >
-//                ولایت پلیت
+//                 پلیت نمبر
+//               </label>
+
+//               <input
+//                 className="form-control"
+//                 name="paletNumber"
+//                 placeholder="پلیت نمبر"
+//                 value={
+//                   form.paletNumber
+//                 }
+//                 onChange={
+//                   handleChange
+//                 }
+//                 onBlur={() =>
+//                   checkExistingTaxi()
+//                 }
+//                 style={fieldStyle}
+//                 disabled={saving}
+//               />
+//             </div>
+//                         {/* CITY */}
+
+//             <div className="col-md-3">
+//               <label
+//                 className="form-label fw-bold w-100"
+//                 style={{
+//                   color: COLORS.dark,
+//                   textAlign: "right",
+//                 }}
+//               >
+//                 ولایت پلیت
 //               </label>
 
 //               <Select
@@ -1214,7 +1214,6 @@
 //                 isDisabled={saving}
 //               />
 //             </div>
-
 //             {/* SERIAL */}
 
 //             <div className="col-md-3">
@@ -1225,7 +1224,7 @@
 //                   textAlign: "right",
 //                 }}
 //               >
-//                 سریال نمبر
+//                 کتابچه سریال نمبر
 //               </label>
 
 //               <input
@@ -1242,38 +1241,6 @@
 //                 disabled={saving}
 //               />
 //             </div>
-
-//             {/* PALET */}
-
-//             <div className="col-md-3">
-//               <label
-//                 className="form-label fw-bold w-100"
-//                 style={{
-//                   color: COLORS.dark,
-//                   textAlign: "right",
-//                 }}
-//               >
-//                 پلیت نمبر
-//               </label>
-
-//               <input
-//                 className="form-control"
-//                 name="paletNumber"
-//                 placeholder="پلیت نمبر"
-//                 value={
-//                   form.paletNumber
-//                 }
-//                 onChange={
-//                   handleChange
-//                 }
-//                 onBlur={() =>
-//                   checkExistingTaxi()
-//                 }
-//                 style={fieldStyle}
-//                 disabled={saving}
-//               />
-//             </div>
-
 //             {/* DURATION */}
 
 //             <div className="col-md-3">
@@ -1459,8 +1426,7 @@
 //                 className="form-select"
 //                 name="destinationProvinceId"
 //                 value={
-//                   form.destinationProvinceId ||
-//                   0
+//                   form.destinationProvinceId || 0
 //                 }
 //                 onChange={
 //                   handleChange
@@ -1790,7 +1756,7 @@
 //                       "nowrap",
 //                   }}
 //                 >
-//                   سریال نمبر
+//                   سریال نمبرک کتابچه
 //                 </th>
 
 //                 <th
@@ -1822,7 +1788,7 @@
 //                       "nowrap",
 //                   }}
 //                 >
-//                   ولایت / ښار
+//                   ولایت پلیت
 //                 </th>
 
 //                 <th
@@ -1901,7 +1867,7 @@
 //                 /* REPORTS */
 
 //                 reports.map(
-//                   (r) => (
+//                   (r, index) => (
 //                     <tr
 //                       key={r.id}
 //                       style={{
@@ -1910,7 +1876,7 @@
 //                       }}
 //                     >
 
-//                       {/* ID */}
+//                       {/* INDEX */}
 
 //                       <td
 //                         className="text-end"
@@ -1925,7 +1891,7 @@
 //                             COLORS.light,
 //                         }}
 //                       >
-//                         {r.id}
+//                         {index + 1}
 //                       </td>
 
 //                       {/* DATE */}
@@ -2186,21 +2152,14 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Select from "react-select";
-
 import DatePickerModule from "react-multi-date-picker";
 import DateObject from "react-date-object";
-
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 const DatePicker = DatePickerModule.default;
-
-// =========================================================
-// API
-// =========================================================
 
 const API_URL = "/report";
 const COMPANY_API = "/company";
@@ -2213,20 +2172,11 @@ const ENUM_KART = `${API_URL}/enums/type-of-kart`;
 const ENUM_ACTIVITY = `${API_URL}/enums/type-of-activity`;
 const ENUM_STATUS = `${API_URL}/enums/kart-status`;
 
-// =========================================================
-// COLORS
-// یوازې درې رنګونه
-// =========================================================
-
 const COLORS = {
   dark: "#343148",
   light: "#cdc6bd",
   brown: "#583432",
 };
-
-// =========================================================
-// FIELD STYLE
-// =========================================================
 
 const fieldStyle = {
   backgroundColor: COLORS.light,
@@ -2238,20 +2188,12 @@ const fieldStyle = {
   textAlign: "right",
 };
 
-// =========================================================
-// SMALL BUTTON STYLE
-// =========================================================
-
 const smallButtonStyle = {
   fontSize: "12px",
   padding: "4px 10px",
   borderRadius: "5px",
   fontWeight: "600",
 };
-
-// =========================================================
-// SEARCHABLE SELECT STYLE
-// =========================================================
 
 const searchableSelectStyles = {
   control: (base) => ({
@@ -2265,25 +2207,21 @@ const searchableSelectStyles = {
     boxShadow: "none",
     direction: "rtl",
     textAlign: "right",
-
     "&:hover": {
       border: `1px solid ${COLORS.dark}`,
     },
   }),
-
   valueContainer: (base) => ({
     ...base,
     padding: "0 10px",
     direction: "rtl",
   }),
-
   singleValue: (base) => ({
     ...base,
     color: COLORS.dark,
     direction: "rtl",
     textAlign: "right",
   }),
-
   placeholder: (base) => ({
     ...base,
     color: COLORS.dark,
@@ -2291,14 +2229,12 @@ const searchableSelectStyles = {
     direction: "rtl",
     textAlign: "right",
   }),
-
   input: (base) => ({
     ...base,
     color: COLORS.dark,
     direction: "rtl",
     textAlign: "right",
   }),
-
   menu: (base) => ({
     ...base,
     backgroundColor: COLORS.light,
@@ -2308,148 +2244,92 @@ const searchableSelectStyles = {
     border: `1px solid ${COLORS.dark}`,
     boxShadow: "none",
   }),
-
   menuList: (base) => ({
     ...base,
     backgroundColor: COLORS.light,
     padding: 0,
     direction: "rtl",
   }),
-
   option: (base, state) => ({
     ...base,
-
     backgroundColor: state.isSelected
       ? COLORS.brown
       : state.isFocused
-      ? COLORS.dark
-      : COLORS.light,
-
+        ? COLORS.dark
+        : COLORS.light,
     color:
       state.isSelected || state.isFocused
         ? COLORS.light
         : COLORS.dark,
-
     cursor: "pointer",
     textAlign: "right",
     direction: "rtl",
     padding: "8px 10px",
   }),
-
   dropdownIndicator: (base) => ({
     ...base,
     color: COLORS.dark,
     padding: "5px",
   }),
-
   clearIndicator: (base) => ({
     ...base,
     color: COLORS.brown,
     padding: "5px",
   }),
-
   indicatorSeparator: (base) => ({
     ...base,
     backgroundColor: COLORS.dark,
   }),
 };
 
-// =========================================================
-// COMPONENT
-// =========================================================
-
 export default function ReportPage() {
   const { user, hasRole } = useAuth();
-
-  // =========================================================
-  // PERMISSIONS
-  // =========================================================
 
   const isOwner = hasRole("Owner");
   const isSimpleUser = hasRole("SimpleUser");
   const isCompanyUser = hasRole("CompanyUser");
-
-  // Owner:
-  // اضافه + سمول + حذف
-  //
-  // SimpleUser:
-  // اضافه
-  //
-  // CompanyUser:
-  // یوازې لیدل
-
   const canCreate = isOwner || isSimpleUser;
+  const [currentUser, setCurrentUser] = useState(null);
   const canEdit = isOwner;
   const canDelete = isOwner;
   const canManage = canCreate || canEdit || canDelete;
 
-  // =========================================================
-  // REPORTS
-  // =========================================================
-
   const [reports, setReports] = useState([]);
-
-  // =========================================================
-  // DROPDOWNS
-  // =========================================================
-
   const [companies, setCompanies] = useState([]);
   const [gpsCompanies, setGpsCompanies] = useState([]);
   const [cities, setCities] = useState([]);
-
   const [durations, setDurations] = useState([]);
   const [kartTypes, setKartTypes] = useState([]);
   const [activities, setActivities] = useState([]);
   const [statuses, setStatuses] = useState([]);
-
   const [companyCities, setCompanyCities] = useState([]);
   const [vehicles, setVehicles] = useState([]);
-
-  // =========================================================
-  // STATES
-  // =========================================================
 
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // =========================================================
-  // FORM
-  // =========================================================
-
   const [form, setForm] = useState({
     id: 0,
-
     companyId: 0,
     gpsCompanyId: 0,
-
     serialNumber: "",
     paletNumber: "",
-
     provincesAndCitiesId: 0,
-
     destinationCompanyId: null,
     destinationProvinceId: null,
-
     reportId: null,
-
     vehicleId: 0,
-
     kartDuration: 0,
     typeOfKart: 0,
     typeOfActivity: 0,
     kartNewRenewLost: 0,
-
+    lostPrice: "",
     reportDate: null,
   });
 
-  // =========================================================
-  // AFGHAN DATE LOCALE
-  // =========================================================
-
   const afghanLocale = {
     ...persian_fa,
-
     months: [
       ["حمل", "حم"],
       ["ثور", "ثو"],
@@ -2465,11 +2345,6 @@ export default function ReportPage() {
       ["حوت", "حو"],
     ],
   };
-
-  // =========================================================
-  // DATE PARSER
-  // Backend string -> DateObject
-  // =========================================================
 
   const parseReportDate = (dateValue) => {
     if (!dateValue) {
@@ -2492,11 +2367,7 @@ export default function ReportPage() {
           format: "YYYY/MM/DD",
         });
       } catch (error) {
-        console.error(
-          "Date conversion error:",
-          error
-        );
-
+        console.error("Date conversion error:", error);
         return null;
       }
     }
@@ -2504,50 +2375,32 @@ export default function ReportPage() {
     return null;
   };
 
-  // =========================================================
-  // DATE STRING
-  // DateObject -> Backend string
-  // =========================================================
-
   const getReportDateString = () => {
     if (!form.reportDate) {
       return null;
     }
 
-    if (
-      typeof form.reportDate.format === "function"
-    ) {
-      return form.reportDate.format(
-        "YYYY/MM/DD"
-      );
+    if (typeof form.reportDate.format === "function") {
+      return form.reportDate.format("YYYY/MM/DD");
     }
 
-    if (
-      typeof form.reportDate === "string"
-    ) {
+    if (typeof form.reportDate === "string") {
       return form.reportDate;
     }
 
     return null;
   };
 
-  // =========================================================
-  // FETCH REPORTS
-  // =========================================================
-
   const fetchReports = async () => {
     try {
       setLoading(true);
-
       const res = await api.get(API_URL);
-
       setReports(res.data);
     } catch (error) {
       console.error(
         "Reports error:",
         error.response?.data || error
       );
-
       toast.error(
         "د راپورونو راوړلو کې ستونزه رامنځته شوه"
       );
@@ -2555,10 +2408,6 @@ export default function ReportPage() {
       setLoading(false);
     }
   };
-
-  // =========================================================
-  // FETCH DROPDOWNS
-  // =========================================================
 
   const fetchDropdowns = async () => {
     try {
@@ -2595,25 +2444,16 @@ export default function ReportPage() {
         "Dropdown error:",
         error.response?.data || error
       );
-
       toast.error(
         "د معلوماتو راوړلو کې ستونزه رامنځته شوه"
       );
     }
   };
 
-  // =========================================================
-  // INITIAL LOAD
-  // =========================================================
-
   useEffect(() => {
     fetchReports();
     fetchDropdowns();
   }, []);
-
-  // =========================================================
-  // HANDLE INPUT CHANGE
-  // =========================================================
 
   const handleChange = (e) => {
     const {
@@ -2632,20 +2472,54 @@ export default function ReportPage() {
         ...prev,
         [name]: value,
       }));
-    } else {
+      return;
+    }
+
+    if (name === "lostPrice") {
       setForm((prev) => ({
         ...prev,
-        [name]:
-          value === ""
-            ? null
-            : Number(value),
+        lostPrice: value,
       }));
+      return;
     }
-  };
 
-  // =========================================================
-  // COMPANY SELECT
-  // =========================================================
+    if (name === "kartNewRenewLost") {
+      const selectedStatusId =
+        value === ""
+          ? 0
+          : Number(value);
+
+      const selectedStatus =
+        statuses.find(
+          (x) =>
+            Number(x.id) ===
+            selectedStatusId
+        );
+
+      const isMosna =
+        selectedStatus?.name?.trim() ===
+        "مثنی";
+
+      setForm((prev) => ({
+        ...prev,
+        kartNewRenewLost:
+          selectedStatusId,
+        lostPrice: isMosna
+          ? prev.lostPrice
+          : "",
+      }));
+
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      [name]:
+        value === ""
+          ? null
+          : Number(value),
+    }));
+  };
 
   const handleCompanySelect = (
     selectedOption
@@ -2662,10 +2536,6 @@ export default function ReportPage() {
 
     getCompanyCities(companyId);
   };
-
-  // =========================================================
-  // CITY SELECT
-  // =========================================================
 
   const handleCitySelect = (
     selectedOption
@@ -2684,10 +2554,6 @@ export default function ReportPage() {
       cityId
     );
   };
-
-  // =========================================================
-  // CREATE
-  // =========================================================
 
   const create = async () => {
     if (!canCreate) {
@@ -2740,6 +2606,20 @@ export default function ReportPage() {
         kartNewRenewLost:
           form.kartNewRenewLost || null,
 
+        lostPrice:
+          form.kartNewRenewLost &&
+          statuses.find(
+            (x) =>
+              Number(x.id) ===
+              Number(form.kartNewRenewLost)
+          )?.name?.trim() === "مثنی"
+            ? (
+                form.lostPrice === ""
+                  ? null
+                  : Number(form.lostPrice)
+              )
+            : null,
+
         dateS:
           getReportDateString(),
       };
@@ -2769,16 +2649,12 @@ export default function ReportPage() {
 
       toast.error(
         err.response?.data?.message ||
-          "د راپور اضافه کولو کې ستونزه رامنځته شوه"
+        "د راپور اضافه کولو کې ستونزه رامنځته شوه"
       );
     } finally {
       setSaving(false);
     }
   };
-
-  // =========================================================
-  // UPDATE
-  // =========================================================
 
   const update = async () => {
     if (!canEdit) {
@@ -2833,6 +2709,20 @@ export default function ReportPage() {
         kartNewRenewLost:
           form.kartNewRenewLost || null,
 
+        lostPrice:
+          form.kartNewRenewLost &&
+          statuses.find(
+            (x) =>
+              Number(x.id) ===
+              Number(form.kartNewRenewLost)
+          )?.name?.trim() === "مثنی"
+            ? (
+                form.lostPrice === ""
+                  ? null
+                  : Number(form.lostPrice)
+              )
+            : null,
+
         dateS:
           getReportDateString(),
       };
@@ -2862,16 +2752,12 @@ export default function ReportPage() {
 
       toast.error(
         err.response?.data?.message ||
-          "د راپور نوي کولو کې ستونزه رامنځته شوه"
+        "د راپور نوي کولو کې ستونزه رامنځته شوه"
       );
     } finally {
       setSaving(false);
     }
   };
-
-  // =========================================================
-  // DELETE
-  // =========================================================
 
   const remove = async (id) => {
     if (!canDelete) {
@@ -2909,16 +2795,12 @@ export default function ReportPage() {
 
       toast.error(
         err.response?.data?.message ||
-          "د راپور حذف کولو کې ستونزه رامنځته شوه"
+        "د راپور حذف کولو کې ستونزه رامنځته شوه"
       );
     } finally {
       setSaving(false);
     }
   };
-
-  // =========================================================
-  // EDIT
-  // =========================================================
 
   const edit = (r) => {
     if (!canEdit) {
@@ -2987,6 +2869,11 @@ export default function ReportPage() {
       kartNewRenewLost:
         r.kartNewRenewLost || 0,
 
+      lostPrice:
+        r.lostPrice ??
+        r.LostPrice ??
+        "",
+
       reportDate,
     });
 
@@ -3003,10 +2890,6 @@ export default function ReportPage() {
       behavior: "smooth",
     });
   };
-
-  // =========================================================
-  // RESET
-  // =========================================================
 
   const reset = () => {
     setForm({
@@ -3032,6 +2915,8 @@ export default function ReportPage() {
       typeOfActivity: 0,
       kartNewRenewLost: 0,
 
+      lostPrice: "",
+
       reportDate: null,
     });
 
@@ -3039,10 +2924,6 @@ export default function ReportPage() {
 
     setIsEdit(false);
   };
-
-  // =========================================================
-  // COMPANY CITIES
-  // =========================================================
 
   const getCompanyCities = async (
     companyId
@@ -3070,10 +2951,6 @@ export default function ReportPage() {
       setCompanyCities([]);
     }
   };
-
-  // =========================================================
-  // CHECK EXISTING TAXI
-  // =========================================================
 
   const checkExistingTaxi = async (
     paletNumberValue = form.paletNumber,
@@ -3115,10 +2992,6 @@ export default function ReportPage() {
     }
   };
 
-  // =========================================================
-  // SEARCHABLE OPTIONS
-  // =========================================================
-
   const companyOptions =
     companies.map((c) => ({
       value: c.id,
@@ -3147,9 +3020,16 @@ export default function ReportPage() {
         )
     ) || null;
 
-  // =========================================================
-  // UI
-  // =========================================================
+  const selectedStatus =
+    statuses.find(
+      (x) =>
+        Number(x.id) ===
+        Number(form.kartNewRenewLost)
+    );
+
+  const isMosna =
+    selectedStatus?.name?.trim() ===
+    "مثنی";
 
   return (
     <div
@@ -3158,20 +3038,12 @@ export default function ReportPage() {
       style={{
         backgroundColor:
           COLORS.light,
-
         minHeight: "100vh",
-
         color: COLORS.dark,
-
         padding: "20px",
-
         textAlign: "right",
       }}
     >
-      {/* =====================================================
-          TITLE
-      ===================================================== */}
-
       <div
         className="d-flex justify-content-between align-items-center mb-4"
         style={{
@@ -3187,21 +3059,6 @@ export default function ReportPage() {
           >
             د راپورونو مدیریت
           </h2>
-
-          <small
-            style={{
-              color: COLORS.brown,
-              fontWeight: "600",
-            }}
-          >
-            {isOwner
-              ? "Owner"
-              : isSimpleUser
-              ? "SimpleUser"
-              : isCompanyUser
-              ? "CompanyUser"
-              : ""}
-          </small>
         </div>
 
         <div
@@ -3214,10 +3071,6 @@ export default function ReportPage() {
           ټول راپورونه: {reports.length}
         </div>
       </div>
-
-      {/* =====================================================
-          COMPANY USER VIEW ONLY MESSAGE
-      ===================================================== */}
 
       {isCompanyUser && (
         <div
@@ -3237,28 +3090,18 @@ export default function ReportPage() {
         </div>
       )}
 
-      {/* =====================================================
-          FORM
-          یوازې Owner او SimpleUser
-      ===================================================== */}
-
       {canManage && (
         <div
           className="p-3 mb-4"
           style={{
             backgroundColor:
               COLORS.light,
-
             border: "none",
-
             boxShadow: "none",
-
             overflow: "visible",
           }}
         >
           <div className="row g-2">
-
-            {/* COMPANY */}
 
             <div className="col-md-3">
               <label
@@ -3307,8 +3150,6 @@ export default function ReportPage() {
               />
             </div>
 
-            {/* GPS COMPANY */}
-
             <div className="col-md-3">
               <label
                 className="form-label fw-bold w-100"
@@ -3349,7 +3190,34 @@ export default function ReportPage() {
               </select>
             </div>
 
-            {/* CITY */}
+            <div className="col-md-3">
+              <label
+                className="form-label fw-bold w-100"
+                style={{
+                  color: COLORS.dark,
+                  textAlign: "right",
+                }}
+              >
+                پلیت نمبر
+              </label>
+
+              <input
+                className="form-control"
+                name="paletNumber"
+                placeholder="پلیت نمبر"
+                value={
+                  form.paletNumber
+                }
+                onChange={
+                  handleChange
+                }
+                onBlur={() =>
+                  checkExistingTaxi()
+                }
+                style={fieldStyle}
+                disabled={saving}
+              />
+            </div>
 
             <div className="col-md-3">
               <label
@@ -3398,8 +3266,6 @@ export default function ReportPage() {
               />
             </div>
 
-            {/* SERIAL */}
-
             <div className="col-md-3">
               <label
                 className="form-label fw-bold w-100"
@@ -3408,7 +3274,7 @@ export default function ReportPage() {
                   textAlign: "right",
                 }}
               >
-                سریال نمبر
+                کتابچه سریال نمبر
               </label>
 
               <input
@@ -3425,39 +3291,6 @@ export default function ReportPage() {
                 disabled={saving}
               />
             </div>
-
-            {/* PALET */}
-
-            <div className="col-md-3">
-              <label
-                className="form-label fw-bold w-100"
-                style={{
-                  color: COLORS.dark,
-                  textAlign: "right",
-                }}
-              >
-                پلیت نمبر
-              </label>
-
-              <input
-                className="form-control"
-                name="paletNumber"
-                placeholder="پلیت نمبر"
-                value={
-                  form.paletNumber
-                }
-                onChange={
-                  handleChange
-                }
-                onBlur={() =>
-                  checkExistingTaxi()
-                }
-                style={fieldStyle}
-                disabled={saving}
-              />
-            </div>
-
-            {/* DURATION */}
 
             <div className="col-md-3">
               <label
@@ -3499,8 +3332,6 @@ export default function ReportPage() {
               </select>
             </div>
 
-            {/* KART TYPE */}
-
             <div className="col-md-3">
               <label
                 className="form-label fw-bold w-100"
@@ -3540,8 +3371,6 @@ export default function ReportPage() {
                 )}
               </select>
             </div>
-
-            {/* ACTIVITY */}
 
             <div className="col-md-3">
               <label
@@ -3583,8 +3412,6 @@ export default function ReportPage() {
               </select>
             </div>
 
-            {/* STATUS */}
-
             <div className="col-md-3">
               <label
                 className="form-label fw-bold w-100"
@@ -3625,7 +3452,37 @@ export default function ReportPage() {
               </select>
             </div>
 
-            {/* DESTINATION */}
+            {/* LOST PRICE - ONLY FOR مثنی */}
+
+            {isMosna && (
+              <div className="col-md-3">
+                <label
+                  className="form-label fw-bold w-100"
+                  style={{
+                    color: COLORS.dark,
+                    textAlign: "right",
+                  }}
+                >
+                  د مثني قیمت
+                </label>
+
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  name="lostPrice"
+                  placeholder="د مثني قیمت"
+                  value={
+                    form.lostPrice
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  style={fieldStyle}
+                  disabled={saving}
+                />
+              </div>
+            )}
 
             <div className="col-md-3">
               <label
@@ -3670,8 +3527,6 @@ export default function ReportPage() {
               </select>
             </div>
 
-            {/* VEHICLE */}
-
             <div className="col-md-3">
               <label
                 className="form-label fw-bold w-100"
@@ -3712,8 +3567,6 @@ export default function ReportPage() {
               </select>
             </div>
 
-            {/* DATE */}
-
             <div className="col-md-3">
               <label
                 className="form-label fw-bold w-100"
@@ -3752,8 +3605,6 @@ export default function ReportPage() {
               />
             </div>
 
-            {/* BUTTONS */}
-
             <div
               className="col-12 d-flex gap-2 mt-2"
               style={{
@@ -3774,13 +3625,10 @@ export default function ReportPage() {
                       }
                       style={{
                         ...smallButtonStyle,
-
                         backgroundColor:
                           COLORS.brown,
-
                         color:
                           COLORS.light,
-
                         border:
                           `1px solid ${COLORS.brown}`,
                       }}
@@ -3804,13 +3652,10 @@ export default function ReportPage() {
                     }
                     style={{
                       ...smallButtonStyle,
-
                       backgroundColor:
                         COLORS.dark,
-
                       color:
                         COLORS.light,
-
                       border:
                         `1px solid ${COLORS.dark}`,
                     }}
@@ -3829,13 +3674,10 @@ export default function ReportPage() {
                 disabled={saving}
                 style={{
                   ...smallButtonStyle,
-
                   backgroundColor:
                     COLORS.brown,
-
                   color:
                     COLORS.light,
-
                   border:
                     `1px solid ${COLORS.brown}`,
                 }}
@@ -3847,63 +3689,47 @@ export default function ReportPage() {
         </div>
       )}
 
-      {/* =====================================================
-          TABLE
-      ===================================================== */}
-
       <div
         className="p-0"
         style={{
           backgroundColor:
             COLORS.light,
-
           border: "none",
-
           boxShadow: "none",
         }}
       >
         <div className="table-responsive">
-
           <table
             className="table mb-0"
             style={{
               color:
                 COLORS.dark,
-
               border:
                 "none",
-
               backgroundColor:
                 COLORS.light,
-
               textAlign:
                 "right",
-
               direction:
                 "rtl",
             }}
           >
-
             <thead
               style={{
                 backgroundColor:
                   COLORS.brown,
-
                 color:
                   COLORS.light,
               }}
             >
               <tr>
-
                 <th
                   className="text-end"
                   style={{
                     border:
                       "none",
-
                     color:
                       COLORS.light,
-
                     whiteSpace:
                       "nowrap",
                   }}
@@ -3916,10 +3742,8 @@ export default function ReportPage() {
                   style={{
                     border:
                       "none",
-
                     color:
                       COLORS.light,
-
                     whiteSpace:
                       "nowrap",
                   }}
@@ -3932,10 +3756,8 @@ export default function ReportPage() {
                   style={{
                     border:
                       "none",
-
                     color:
                       COLORS.light,
-
                     whiteSpace:
                       "nowrap",
                   }}
@@ -3948,10 +3770,8 @@ export default function ReportPage() {
                   style={{
                     border:
                       "none",
-
                     color:
                       COLORS.light,
-
                     whiteSpace:
                       "nowrap",
                   }}
@@ -3964,15 +3784,13 @@ export default function ReportPage() {
                   style={{
                     border:
                       "none",
-
                     color:
                       COLORS.light,
-
                     whiteSpace:
                       "nowrap",
                   }}
                 >
-                  سریال نمبر
+                  سریال نمبرک کتابچه
                 </th>
 
                 <th
@@ -3980,10 +3798,8 @@ export default function ReportPage() {
                   style={{
                     border:
                       "none",
-
                     color:
                       COLORS.light,
-
                     whiteSpace:
                       "nowrap",
                   }}
@@ -3996,10 +3812,8 @@ export default function ReportPage() {
                   style={{
                     border:
                       "none",
-
                     color:
                       COLORS.light,
-
                     whiteSpace:
                       "nowrap",
                   }}
@@ -4012,24 +3826,18 @@ export default function ReportPage() {
                   style={{
                     border:
                       "none",
-
                     color:
                       COLORS.light,
-
                     whiteSpace:
                       "nowrap",
                   }}
                 >
                   کړنې
                 </th>
-
               </tr>
             </thead>
 
             <tbody>
-
-              {/* LOADING */}
-
               {loading ? (
                 <tr>
                   <td
@@ -4038,13 +3846,10 @@ export default function ReportPage() {
                     style={{
                       border:
                         "none",
-
                       backgroundColor:
                         COLORS.light,
-
                       color:
                         COLORS.dark,
-
                       padding:
                         "20px",
                     }}
@@ -4053,9 +3858,6 @@ export default function ReportPage() {
                   </td>
                 </tr>
               ) : reports.length === 0 ? (
-
-                /* NO DATA */
-
                 <tr>
                   <td
                     colSpan="8"
@@ -4063,13 +3865,10 @@ export default function ReportPage() {
                     style={{
                       border:
                         "none",
-
                       backgroundColor:
                         COLORS.light,
-
                       color:
                         COLORS.dark,
-
                       padding:
                         "20px",
                     }}
@@ -4077,11 +3876,7 @@ export default function ReportPage() {
                     هېڅ راپور ونه موندل شو
                   </td>
                 </tr>
-
               ) : (
-
-                /* REPORTS */
-
                 reports.map(
                   (r, index) => (
                     <tr
@@ -4091,18 +3886,13 @@ export default function ReportPage() {
                           COLORS.light,
                       }}
                     >
-
-                      {/* INDEX */}
-
                       <td
                         className="text-end"
                         style={{
                           border:
                             "none",
-
                           color:
                             COLORS.dark,
-
                           backgroundColor:
                             COLORS.light,
                         }}
@@ -4110,20 +3900,15 @@ export default function ReportPage() {
                         {index + 1}
                       </td>
 
-                      {/* DATE */}
-
                       <td
                         className="text-end"
                         style={{
                           border:
                             "none",
-
                           color:
                             COLORS.dark,
-
                           backgroundColor:
                             COLORS.light,
-
                           whiteSpace:
                             "nowrap",
                         }}
@@ -4132,17 +3917,13 @@ export default function ReportPage() {
                           "-"}
                       </td>
 
-                      {/* COMPANY */}
-
                       <td
                         className="text-end"
                         style={{
                           border:
                             "none",
-
                           color:
                             COLORS.dark,
-
                           backgroundColor:
                             COLORS.light,
                         }}
@@ -4151,17 +3932,13 @@ export default function ReportPage() {
                           "-"}
                       </td>
 
-                      {/* GPS */}
-
                       <td
                         className="text-end"
                         style={{
                           border:
                             "none",
-
                           color:
                             COLORS.dark,
-
                           backgroundColor:
                             COLORS.light,
                         }}
@@ -4170,17 +3947,13 @@ export default function ReportPage() {
                           "-"}
                       </td>
 
-                      {/* SERIAL */}
-
                       <td
                         className="text-end"
                         style={{
                           border:
                             "none",
-
                           color:
                             COLORS.dark,
-
                           backgroundColor:
                             COLORS.light,
                         }}
@@ -4189,17 +3962,13 @@ export default function ReportPage() {
                           "-"}
                       </td>
 
-                      {/* PALET */}
-
                       <td
                         className="text-end"
                         style={{
                           border:
                             "none",
-
                           color:
                             COLORS.dark,
-
                           backgroundColor:
                             COLORS.light,
                         }}
@@ -4208,17 +3977,13 @@ export default function ReportPage() {
                           "-"}
                       </td>
 
-                      {/* CITY */}
-
                       <td
                         className="text-end"
                         style={{
                           border:
                             "none",
-
                           color:
                             COLORS.dark,
-
                           backgroundColor:
                             COLORS.light,
                         }}
@@ -4228,14 +3993,11 @@ export default function ReportPage() {
                           "-"}
                       </td>
 
-                      {/* ACTIONS */}
-
                       <td
                         className="text-end"
                         style={{
                           border:
                             "none",
-
                           backgroundColor:
                             COLORS.light,
                         }}
@@ -4247,9 +4009,6 @@ export default function ReportPage() {
                               "rtl",
                           }}
                         >
-
-                          {/* EDIT */}
-
                           {canEdit && (
                             <button
                               type="button"
@@ -4262,13 +4021,10 @@ export default function ReportPage() {
                               }
                               style={{
                                 ...smallButtonStyle,
-
                                 backgroundColor:
                                   COLORS.dark,
-
                                 color:
                                   COLORS.light,
-
                                 border:
                                   `1px solid ${COLORS.dark}`,
                               }}
@@ -4276,8 +4032,6 @@ export default function ReportPage() {
                               سمول
                             </button>
                           )}
-
-                          {/* DELETE */}
 
                           {canDelete && (
                             <button
@@ -4293,13 +4047,10 @@ export default function ReportPage() {
                               }
                               style={{
                                 ...smallButtonStyle,
-
                                 backgroundColor:
                                   COLORS.brown,
-
                                 color:
                                   COLORS.light,
-
                                 border:
                                   `1px solid ${COLORS.brown}`,
                               }}
@@ -4308,18 +4059,14 @@ export default function ReportPage() {
                             </button>
                           )}
 
-                          {/* SIMPLE USER */}
-
                           {isSimpleUser &&
                             !isOwner && (
                               <span
                                 style={{
                                   fontSize:
                                     "12px",
-
                                   color:
                                     COLORS.brown,
-
                                   fontWeight:
                                     "600",
                                 }}
@@ -4328,17 +4075,13 @@ export default function ReportPage() {
                               </span>
                             )}
 
-                          {/* COMPANY USER */}
-
                           {isCompanyUser && (
                             <span
                               style={{
                                 fontSize:
                                   "12px",
-
                                 color:
                                   COLORS.brown,
-
                                 fontWeight:
                                   "600",
                               }}
@@ -4346,18 +4089,14 @@ export default function ReportPage() {
                               لیدل
                             </span>
                           )}
-
                         </div>
                       </td>
-
                     </tr>
                   )
                 )
               )}
-
             </tbody>
           </table>
-
         </div>
       </div>
     </div>

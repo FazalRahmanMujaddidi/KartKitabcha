@@ -399,7 +399,7 @@ export default function Users() {
               <thead>
                 <tr>
                   <th>نوم</th>
-                  <th>کارن نوم</th>
+                  <th>کارونکی نوم</th>
                   <th>موبایل</th>
                   <th>شرکت</th>
                   <th>رول</th>

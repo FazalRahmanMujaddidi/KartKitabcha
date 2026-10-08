@@ -109,8 +109,23 @@ namespace KartKitabch.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("AutoCloseEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CompanyCategory")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CompanyPlace")
+                        .HasColumnType("int");
+
                     b.Property<int>("CompanyTon")
                         .HasColumnType("int");
+
+                    b.Property<int>("ExtraReportBatches")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAddingClosed")
+                        .HasColumnType("bit");
 
                     b.Property<int>("MyProperty")
                         .HasColumnType("int");
@@ -132,8 +147,17 @@ namespace KartKitabch.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("AutoCloseEnabled")
+                        .HasColumnType("bit");
+
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
+
+                    b.Property<int>("ExtraReportBatches")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAddingClosed")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ProvincesAndCitiesId")
                         .HasColumnType("int");
@@ -306,6 +330,9 @@ namespace KartKitabch.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("KartNewRenewLost")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LostPrice")
                         .HasColumnType("int");
 
                     b.Property<string>("PaletNumber")

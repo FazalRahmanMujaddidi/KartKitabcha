@@ -324,7 +324,7 @@ export default function CompanyLocationPage() {
           textAlign: "right",
         }}
       >
-        د شرکتونو ځایونه
+        د شرکتونو مسیرونه
       </h2>
 
       {/* ==============================
@@ -357,8 +357,8 @@ export default function CompanyLocationPage() {
             }}
           >
             {isEdit
-              ? "د شرکت ځای سمول"
-              : "د شرکت ځای اضافه کول"}
+              ? "د شرکت مسیر سمول"
+              : "د شرکت مسیر اضافه کول"}
           </h5>
         </div>
 
@@ -577,38 +577,44 @@ export default function CompanyLocationPage() {
                   >
                     <td
                       style={{
+                        backgroundColor: "#cdc6bd",
                         color: COLORS.dark,
                         textAlign: "right",
+                        border: "none",
                       }}
                     >
                       {index + 1}
                     </td>
-
                     <td
                       style={{
+                        backgroundColor: "#cdc6bd",
                         color: COLORS.dark,
                         fontWeight: "600",
                         textAlign: "right",
+                        border: "none",
                       }}
                     >
                       {x.company?.name}
                     </td>
-
                     <td
                       style={{
+                        backgroundColor: "#cdc6bd",
                         color: COLORS.dark,
                         fontWeight: "600",
                         textAlign: "right",
+                        border: "none",
                       }}
                     >
                       {x.provincesAndCities?.name}
                     </td>
-
                     {isOwner && (
                       <td
                         style={{
+                          backgroundColor: "#cdc6bd",
+                          color: COLORS.dark,
                           textAlign: "right",
                           whiteSpace: "nowrap",
+                          border: "none",
                         }}
                       >
                         <button
@@ -624,7 +630,6 @@ export default function CompanyLocationPage() {
                         >
                           سمول
                         </button>
-
                         <button
                           type="button"
                           className="btn"
