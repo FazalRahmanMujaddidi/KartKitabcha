@@ -604,53 +604,54 @@ export default function CompanyLocationPage() {
               {/* ==============================
                   جدول سر
               ============================== */}
-              <thead>
-                <tr
-                  style={{
-                    backgroundColor: COLORS.dark,
-                  }}
-                >
-                  <th
-                    style={{
-                      color: COLORS.light,
-                      textAlign: "right",
-                    }}
-                  >
-                    شمېره
-                  </th>
+<thead>
+  <tr style={{ backgroundColor: COLORS.dark }}>
+    <th
+      style={{
+        backgroundColor: COLORS.dark,
+        color: COLORS.light,
+        textAlign: "right",
+      }}
+    >
+      شمېره
+    </th>
 
-                  <th
-                    style={{
-                      color: COLORS.light,
-                      textAlign: "right",
-                    }}
-                  >
-                    شرکت
-                  </th>
+    <th
+      style={{
+        backgroundColor: COLORS.dark,
+        color: COLORS.light,
+        textAlign: "right",
+      }}
+    >
+      شرکت
+    </th>
 
-                  <th
-                    style={{
-                      color: COLORS.light,
-                      textAlign: "right",
-                    }}
-                  >
-                    ښار
-                  </th>
+    <th
+      style={{
+        backgroundColor: COLORS.dark,
+        color: COLORS.light,
+        textAlign: "right",
+        width: "180px",
+      }}
+    >
+      ښار
+    </th>
 
-                  {/* یوازې Owner ته کړنې */}
-                  {isOwner && (
-                    <th
-                      style={{
-                        color: COLORS.light,
-                        textAlign: "right",
-                        width: "180px",
-                      }}
-                    >
-                      کړنې
-                    </th>
-                  )}
-                </tr>
-              </thead>
+    {/* یوازې Owner ته کړنې */}
+    {isOwner && (
+      <th
+        style={{
+          backgroundColor: COLORS.dark,
+          color: COLORS.light,
+          textAlign: "right",
+          width: "180px",
+        }}
+      >
+        کړنې
+      </th>
+    )}
+  </tr>
+</thead>
 
               {/* ==============================
                   جدول معلومات

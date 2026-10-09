@@ -21,6 +21,7 @@ namespace KartKitabch.Data
         public DbSet<Letter> Letters { get; set; }
         public DbSet<Person> Person { get; set; }
         public DbSet<OfficeContent> OfficeContents { get; set; }
+        public DbSet<VehicleCompanyHistory> VehicleCompanyHistories { get; set; }
         public DbSet<Sender> Senders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

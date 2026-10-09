@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
- const API_URL = "http://localhost:5256/api/GPSCompany";
-// const API_URL = "/api/GPSCompany";
+// const API_URL = "http://localhost:5256/api/GPSCompany";
+ const API_URL = "/api/GPSCompany";
 
 // یوازې درې رنګونه
 const COLORS = {
@@ -389,14 +389,14 @@ export default function GPSCompany() {
               ================================================== */}
 
               <thead>
-
                 <tr
                   style={{
-                    backgroundColor: COLORS.dark,
+                    backgroundColor: COLORS.brown,
                   }}
                 >
                   <th
                     style={{
+                      backgroundColor: COLORS.brown,
                       color: COLORS.light,
                       textAlign: "right",
                       border: "none",
@@ -407,6 +407,7 @@ export default function GPSCompany() {
 
                   <th
                     style={{
+                      backgroundColor: COLORS.brown,
                       color: COLORS.light,
                       textAlign: "right",
                       border: "none",
@@ -417,6 +418,7 @@ export default function GPSCompany() {
 
                   <th
                     style={{
+                      backgroundColor: COLORS.brown,
                       color: COLORS.light,
                       textAlign: "right",
                       width: "180px",
@@ -426,7 +428,6 @@ export default function GPSCompany() {
                     کړنې
                   </th>
                 </tr>
-
               </thead>
 
               {/* ==================================================

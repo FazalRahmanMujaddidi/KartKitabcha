@@ -25,9 +25,10 @@ namespace KartKitabch.Controllers
             _userManager = userManager;
         }
 
+
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Report>>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -64,7 +65,62 @@ namespace KartKitabch.Controllers
                     x.CompanyId == currentUser.CompanyId.Value);
             }
 
-            return await query.ToListAsync();
+        var reports = await query
+    .OrderByDescending(r => r.Id)
+    .ToListAsync();
+
+            var result = reports.Select(r =>
+            {
+                var history = _context.VehicleCompanyHistories
+                    .Where(h =>
+                        h.PaletNumber == r.PaletNumber &&
+                        h.ProvincesAndCitiesId == r.ProvincesAndCitiesId &&
+                        h.VehicleId == r.VehicleId)
+                    .ToList();
+
+                return new
+                {
+                    r.Id,
+                    r.CompanyId,
+                    r.Company,
+                    r.SerialNumber,
+                    r.PaletNumber,
+                    r.ProvincesAndCitiesId,
+                    r.ProvincesAndCities,
+                    r.DestinationCompanyId,
+                    r.DestinationCompany,
+                    r.DestinationProvinceId,
+                    r.DestinationProvince,
+                    r.ReportId,
+                    r.KartDuration,
+                    r.TypeOfKart,
+                    r.TypeOfActivity,
+                    r.KartNewRenewLost,
+                    r.VehicleId,
+                    r.Vehicle,
+                    r.GPSCompanyId,
+                    r.GPSCompany,
+                    r.DateS,
+                    r.Chasis,
+                    r.LostPrice,
+
+                    PreviousCompanyName = history
+                        .OrderByDescending(h => h.TransferDate)
+                        .Select(h => h.Company?.Name ??
+                            _context.Companies
+                                .Where(c => c.Id == h.CompanyId)
+                                .Select(c => c.Name)
+                                .FirstOrDefault())
+                        .FirstOrDefault(),
+
+                    PreviousCompanyCount = history
+                        .Select(h => h.CompanyId)
+                        .Distinct()
+                        .Count()
+                };
+            }).ToList();
+
+            return Ok(result);
         }
 
         [Authorize]
@@ -110,45 +166,51 @@ namespace KartKitabch.Controllers
             return item;
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Report report)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Remove navigation properties
             report.Company = null;
             report.ProvincesAndCities = null;
             report.DestinationCompany = null;
             report.DestinationProvince = null;
             report.GPSCompany = null;
+            report.Vehicle = null!;
 
-            // --------------------------------------------------
-            // Get selected company
-            // --------------------------------------------------
             var company = await _context.Companies
                 .FirstOrDefaultAsync(x => x.Id == report.CompanyId);
 
             if (company == null)
-            {
-                return BadRequest(new
-                {
-                    message = "Company not found."
-                });
-            }
+                return BadRequest(new { message = "Company not found." });
 
-            // --------------------------------------------------
-            // TAXI + ولایت_والسوالی_مقصد_تکسی
-            // Each CompanyLocation allows 100 records.
-            // CompanyLocation is DestinationProvinceId.
-            // --------------------------------------------------
+            // Verify that the selected vehicle type exists.
+            var vehicleExists = await _context.Set<vehicle>()
+                .AnyAsync(x => x.Id == report.VehicleId);
+
+            if (!vehicleExists)
+                return BadRequest(new { message = "Vehicle type not found." });
+
+            // The three fields below identify a vehicle record.
+            // SerialNumber is deliberately NOT used for matching.
+            var existing = await _context.Report.FirstOrDefaultAsync(x =>
+                x.PaletNumber == report.PaletNumber &&
+                x.ProvincesAndCitiesId == report.ProvincesAndCitiesId &&
+                x.VehicleId == report.VehicleId
+            );
+
             var isTaxiWithLocationLimit =
                 company.MyProperty == CompanyType.تکسی &&
-                company.CompanyCategory == CompanyCategory.ولایت_والسوالی_مقصد_تکسی;
+                company.CompanyCategory ==
+                    CompanyCategory.ولایت_والسوالی_مقصد_تکسی;
 
+            int? destinationProvinceId = null;
+
+            // Validate Taxi location.
             if (isTaxiWithLocationLimit)
             {
-                // CompanyLocation is required
                 if (!report.DestinationProvinceId.HasValue ||
                     report.DestinationProvinceId.Value <= 0)
                 {
@@ -158,16 +220,12 @@ namespace KartKitabch.Controllers
                     });
                 }
 
-                var destinationProvinceId =
-                    report.DestinationProvinceId.Value;
+                destinationProvinceId = report.DestinationProvinceId.Value;
 
-                // --------------------------------------------------
-                // Check that this location belongs to this company
-                // --------------------------------------------------
-                var locationExists = await _context.CompanyLocations
-                    .AnyAsync(x =>
-                        x.CompanyId == report.CompanyId &&
-                        x.ProvincesAndCitiesId == destinationProvinceId);
+                var locationExists = await _context.CompanyLocations.AnyAsync(x =>
+                    x.CompanyId == report.CompanyId &&
+                    x.ProvincesAndCitiesId == destinationProvinceId.Value
+                );
 
                 if (!locationExists)
                 {
@@ -176,211 +234,116 @@ namespace KartKitabch.Controllers
                         message = "This CompanyLocation does not belong to the selected company."
                     });
                 }
+            }
 
-                // --------------------------------------------------
-                // Find existing taxi
-                // --------------------------------------------------
-                var existing = await _context.Report
-                    .FirstOrDefaultAsync(x =>
-                        x.PaletNumber == report.PaletNumber &&
-                        x.ProvincesAndCitiesId == report.ProvincesAndCitiesId);
-
-                // --------------------------------------------------
-                // New taxi
-                // --------------------------------------------------
-                if (existing == null)
+            // CASE 1: No report matches all three identifying fields.
+            // Create a new report and leave all existing reports unchanged.
+            if (existing == null)
+            {
+                if (isTaxiWithLocationLimit)
                 {
-                    var locationTotal = await _context.Report
-                        .CountAsync(x =>
-                            x.CompanyId == report.CompanyId &&
-                            x.DestinationProvinceId == destinationProvinceId);
+                    var locationTotal = await _context.Report.CountAsync(x =>
+                        x.CompanyId == report.CompanyId &&
+                        x.DestinationProvinceId == destinationProvinceId.Value
+                    );
 
                     if (locationTotal >= 100)
                     {
                         return BadRequest(new
                         {
-                            message =
-                                "This CompanyLocation has reached the maximum of 100 records.",
-
+                            message = "This CompanyLocation has reached the maximum of 100 records.",
                             companyId = report.CompanyId,
-
-                            companyLocationId = destinationProvinceId,
-
+                            companyLocationId = destinationProvinceId.Value,
                             totalRecords = locationTotal,
-
                             maximumRecords = 100
                         });
                     }
-
-                    _context.Report.Add(report);
-
-                    await _context.SaveChangesAsync();
-
-                    return Ok(new
-                    {
-                        message = "New taxi created successfully.",
-
-                        totalRecords = locationTotal + 1,
-
-                        maximumRecords = 100,
-
-                        companyLocationId = destinationProvinceId
-                    });
                 }
 
-                // --------------------------------------------------
-                // Existing Taxi -> Transfer
-                // --------------------------------------------------
+                _context.Report.Add(report);
+                await _context.SaveChangesAsync();
 
-                // Check whether this existing taxi is already
-                // assigned to the same company and same location.
+                return Ok(new
+                {
+                    message = "New report created successfully."
+                });
+            }
+
+            // CASE 2: The three identifying fields match.
+            // Check whether the company is changing.
+            var companyChanged = existing.CompanyId != report.CompanyId;
+
+            // Enforce the Taxi location limit when adding this vehicle
+            // to another company/location.
+            if (isTaxiWithLocationLimit)
+            {
                 var sameCompanyAndLocation =
                     existing.CompanyId == report.CompanyId &&
                     existing.DestinationProvinceId == destinationProvinceId;
 
-                // If it is being moved to a new company/location,
-                // that destination location must have space.
                 if (!sameCompanyAndLocation)
                 {
-                    var locationTotal = await _context.Report
-                        .CountAsync(x =>
-                            x.CompanyId == report.CompanyId &&
-                            x.DestinationProvinceId == destinationProvinceId);
+                    var locationTotal = await _context.Report.CountAsync(x =>
+                        x.CompanyId == report.CompanyId &&
+                        x.DestinationProvinceId == destinationProvinceId.Value
+                    );
 
                     if (locationTotal >= 100)
                     {
                         return BadRequest(new
                         {
-                            message =
-                                "This CompanyLocation has reached the maximum of 100 records.",
-
+                            message = "This CompanyLocation has reached the maximum of 100 records.",
                             companyId = report.CompanyId,
-
-                            companyLocationId = destinationProvinceId,
-
+                            companyLocationId = destinationProvinceId.Value,
                             totalRecords = locationTotal,
-
                             maximumRecords = 100
                         });
                     }
                 }
-
-                // Current company becomes the selected company
-                existing.CompanyId = report.CompanyId;
-
-                existing.VehicleId = report.VehicleId;
-
-                existing.GPSCompanyId = report.GPSCompanyId;
-
-                // Save destination information
-                existing.DestinationCompanyId =
-                    report.DestinationCompanyId;
-
-                existing.DestinationProvinceId =
-                    report.DestinationProvinceId;
-
-                existing.SerialNumber =
-                    report.SerialNumber;
-
-                existing.Chasis =
-                    report.Chasis;
-
-                existing.DateS =
-                    report.DateS;
-
-                existing.KartDuration =
-                    report.KartDuration;
-
-                existing.TypeOfKart =
-                    report.TypeOfKart;
-
-                existing.TypeOfActivity =
-                    report.TypeOfActivity;
-
-                existing.KartNewRenewLost =
-                    report.KartNewRenewLost;
-                existing.LostPrice =
-                    report.KartNewRenewLost == KartNewRenewLost.مثنی
-                        ? report.LostPrice
-                        : null;
-                await _context.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    message = "Taxi transferred successfully."
-                });
             }
 
-            // --------------------------------------------------
-            // NON-TAXI / OTHER COMPANIES
-            // Keep your existing behavior.
-            // --------------------------------------------------
-
-            var existingOther = await _context.Report
-                .FirstOrDefaultAsync(x =>
-                    x.PaletNumber == report.PaletNumber &&
-                    x.ProvincesAndCitiesId == report.ProvincesAndCitiesId);
-
-            // --------------------------------------------------
-            // New record
-            // --------------------------------------------------
-            if (existingOther == null)
+            // Save the previous company BEFORE changing the current company.
+            if (companyChanged)
             {
-                _context.Report.Add(report);
-
-                await _context.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    message = "New taxi created successfully."
-                });
+                _context.VehicleCompanyHistories.Add(
+                    new VehicleCompanyHistory
+                    {
+                        PaletNumber = existing.PaletNumber,
+                        ProvincesAndCitiesId = existing.ProvincesAndCitiesId,
+                        VehicleId = existing.VehicleId,
+                        CompanyId = existing.CompanyId,
+                        TransferDate = DateTime.UtcNow
+                    }
+                );
             }
 
-            // --------------------------------------------------
-            // Existing record -> Transfer
-            // --------------------------------------------------
-            existingOther.CompanyId = report.CompanyId;
-            existingOther.VehicleId = report.VehicleId;
-            existingOther.GPSCompanyId = report.GPSCompanyId;
-
-            existingOther.DestinationCompanyId =
-                report.DestinationCompanyId;
-
-            existingOther.DestinationProvinceId =
-                report.DestinationProvinceId;
-
-            existingOther.SerialNumber =
-                report.SerialNumber;
-
-            existingOther.Chasis =
-                report.Chasis;
-
-            existingOther.DateS =
-                report.DateS;
-
-            existingOther.KartDuration =
-                report.KartDuration;
-
-            existingOther.TypeOfKart =
-                report.TypeOfKart;
-
-            existingOther.TypeOfActivity =
-                report.TypeOfActivity;
-
-            existingOther.KartNewRenewLost =
-                report.KartNewRenewLost;
-            existingOther.LostPrice =
+            // Update non-identifying fields.
+            // Do NOT change PaletNumber, ProvincesAndCitiesId, or VehicleId.
+            existing.CompanyId = report.CompanyId;
+            existing.GPSCompanyId = report.GPSCompanyId;
+            existing.DestinationCompanyId = report.DestinationCompanyId;
+            existing.DestinationProvinceId = report.DestinationProvinceId;
+            existing.SerialNumber = report.SerialNumber;
+            existing.Chasis = report.Chasis;
+            existing.DateS = report.DateS;
+            existing.KartDuration = report.KartDuration;
+            existing.TypeOfKart = report.TypeOfKart;
+            existing.TypeOfActivity = report.TypeOfActivity;
+            existing.KartNewRenewLost = report.KartNewRenewLost;
+            existing.LostPrice =
                 report.KartNewRenewLost == KartNewRenewLost.مثنی
                     ? report.LostPrice
                     : null;
+
             await _context.SaveChangesAsync();
 
             return Ok(new
             {
-                message = "Taxi transferred successfully."
+                message = companyChanged
+                    ? "Vehicle transferred successfully."
+                    : "Report updated successfully."
             });
         }
-
         [HttpGet("check-existing")]
         public async Task<IActionResult> CheckExisting(
             string paletNumber,
@@ -414,34 +377,141 @@ namespace KartKitabch.Controllers
             });
         }
 
-        // UPDATE
+
+
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, Report report)
         {
             if (id != report.Id)
-                return BadRequest();
+                return BadRequest(new { message = "ID mismatch." });
 
             var item = await _context.Report.FindAsync(id);
 
             if (item == null)
                 return NotFound();
 
+            // Validate the selected company.
+            var companyExists = await _context.Companies
+                .AnyAsync(x => x.Id == report.CompanyId);
+
+            if (!companyExists)
+                return BadRequest(new { message = "Company not found." });
+
+            // Validate the selected vehicle type.
+            var vehicleExists = await _context.Set<vehicle>()
+                .AnyAsync(x => x.Id == report.VehicleId);
+
+            if (!vehicleExists)
+                return BadRequest(new { message = "Vehicle type not found." });
+
+            // Identity fields must remain unchanged on the existing record.
+            bool identityChanged =
+                item.PaletNumber != report.PaletNumber ||
+                item.ProvincesAndCitiesId != report.ProvincesAndCitiesId ||
+                item.VehicleId != report.VehicleId;
+
+            if (identityChanged)
+            {
+                // A changed identity represents a new record.
+                // Keep the original report unchanged.
+                var newReport = new Report
+                {
+                    CompanyId = report.CompanyId,
+                    SerialNumber = report.SerialNumber,
+                    PaletNumber = report.PaletNumber,
+                    ProvincesAndCitiesId = report.ProvincesAndCitiesId,
+                    KartDuration = report.KartDuration,
+                    TypeOfKart = report.TypeOfKart,
+                    TypeOfActivity = report.TypeOfActivity,
+                    KartNewRenewLost = report.KartNewRenewLost,
+                    Chasis = report.Chasis,
+                    GPSCompanyId = report.GPSCompanyId,
+                    DestinationCompanyId = report.DestinationCompanyId,
+                    DestinationProvinceId = report.DestinationProvinceId,
+                    VehicleId = report.VehicleId,
+                    ReportId = report.ReportId,
+                    DateS = report.DateS,
+                    LostPrice = report.KartNewRenewLost == KartNewRenewLost.مثنی
+                        ? report.LostPrice
+                        : null
+                };
+
+                _context.Report.Add(newReport);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Identity changed. A new report was created; the original report was preserved.",
+                    newReportId = newReport.Id
+                });
+            }
+
+            // Identity matches. Record the previous company before transferring.
+            if (item.CompanyId != report.CompanyId)
+            {
+                _context.VehicleCompanyHistories.Add(
+                    new VehicleCompanyHistory
+                    {
+                        PaletNumber = item.PaletNumber,
+                        ProvincesAndCitiesId = item.ProvincesAndCitiesId,
+                        VehicleId = item.VehicleId,
+                        CompanyId = item.CompanyId,
+                        TransferDate = DateTime.UtcNow
+                    });
+            }
+
+            // Update other fields. Do not change the three identity fields.
             item.CompanyId = report.CompanyId;
             item.SerialNumber = report.SerialNumber;
-            item.PaletNumber = report.PaletNumber;
-            item.ProvincesAndCitiesId = report.ProvincesAndCitiesId;
             item.KartDuration = report.KartDuration;
             item.TypeOfKart = report.TypeOfKart;
             item.TypeOfActivity = report.TypeOfActivity;
             item.KartNewRenewLost = report.KartNewRenewLost;
             item.Chasis = report.Chasis;
             item.GPSCompanyId = report.GPSCompanyId;
+            item.DestinationCompanyId = report.DestinationCompanyId;
+            item.DestinationProvinceId = report.DestinationProvinceId;
+            item.ReportId = report.ReportId;
+            item.DateS = report.DateS;
+            item.LostPrice = report.KartNewRenewLost == KartNewRenewLost.مثنی
+                ? report.LostPrice
+                : null;
 
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+        [HttpGet("history")]
+        public async Task<IActionResult> GetVehicleHistory(
+            string paletNumber,
+            int provincesAndCitiesId,
+            int vehicleId)
+        {
+            var history = await _context.VehicleCompanyHistories
+                .Where(h =>
+                    h.PaletNumber == paletNumber &&
+                    h.ProvincesAndCitiesId == provincesAndCitiesId &&
+                    h.VehicleId == vehicleId)
+                .OrderByDescending(h => h.TransferDate)
+                .Select(h => new
+                {
+                    h.Id,
+                    h.PaletNumber,
+                    h.ProvincesAndCitiesId,
+                    h.VehicleId,
+                    h.CompanyId,
+                    CompanyName = h.Company != null
+                        ? h.Company.Name
+                        : _context.Companies
+                            .Where(c => c.Id == h.CompanyId)
+                            .Select(c => c.Name)
+                            .FirstOrDefault(),
+                    h.TransferDate
+                })
+                .ToListAsync();
 
+            return Ok(history);
+        }
         // DELETE
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)

@@ -1,0 +1,85 @@
+.history-overlay {
+  animation: historyFadeIn 0.22s ease-out;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.history-modal {
+  animation: historySlideIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  scrollbar-width: thin;
+  scrollbar-color: #583432 #cdc6bd;
+}
+
+.history-close {
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.history-close:hover {
+  background-color: #754842 !important;
+  transform: scale(1.06);
+}
+
+.history-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.history-table tbody tr:hover {
+  background-color: #e4ddd4 !important;
+}
+
+.history-table th,
+.history-table td {
+  padding: 12px 14px;
+}
+
+.history-footer-button {
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.history-footer-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+@keyframes historyFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes historySlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-overlay,
+  .history-modal {
+    animation: none;
+  }
+
+  .history-close,
+  .history-table tbody tr,
+  .history-footer-button {
+    transition: none;
+  }
+}
+@keyframes historySpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

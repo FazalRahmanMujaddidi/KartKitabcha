@@ -9,6 +9,7 @@ import DateObject from "react-date-object";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import api from "../services/api";
+import "./Report.css";
 import { useAuth } from "../context/AuthContext";
 
 const DatePicker = DatePickerModule.default;
@@ -23,6 +24,9 @@ const ENUM_DURATION = `${API_URL}/enums/kart-duration`;
 const ENUM_KART = `${API_URL}/enums/type-of-kart`;
 const ENUM_ACTIVITY = `${API_URL}/enums/type-of-activity`;
 const ENUM_STATUS = `${API_URL}/enums/kart-status`;
+
+
+
 
 const COLORS = {
   dark: "#343148",
@@ -160,7 +164,14 @@ export default function ReportPage() {
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  // Vehicle company history popup state
+  const [showHistory, setShowHistory] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [vehicleHistory, setVehicleHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState("");
 
+  // Keep the rest of your existing component code below
   const [form, setForm] = useState({
     id: 0,
     companyId: 0,
@@ -476,10 +487,7 @@ export default function ReportPage() {
           getReportDateString(),
       };
 
-      console.log(
-        "CREATE PAYLOAD:",
-        payload
-      );
+
 
       await api.post(
         API_URL,
@@ -579,10 +587,7 @@ export default function ReportPage() {
           getReportDateString(),
       };
 
-      console.log(
-        "UPDATE PAYLOAD:",
-        payload
-      );
+
 
       await api.put(
         `${API_URL}/${form.id}`,
@@ -804,45 +809,6 @@ export default function ReportPage() {
     }
   };
 
-  // const checkExistingTaxi = async (
-  //   paletNumberValue = form.paletNumber,
-  //   provinceCityIdValue =
-  //     form.provincesAndCitiesId
-  // ) => {
-  //   if (
-  //     !paletNumberValue ||
-  //     !provinceCityIdValue
-  //   ) {
-  //     return;
-  //   }
-
-  //   try {
-  //     const res =
-  //       await api.get(
-  //         `${API_URL}/check-existing`,
-  //         {
-  //           params: {
-  //             paletNumber:
-  //               paletNumberValue,
-
-  //             provincesAndCitiesId:
-  //               provinceCityIdValue,
-  //           },
-  //         }
-  //       );
-
-  //     if (res.data.exists) {
-  //       toast.warning(
-  //         res.data.message
-  //       );
-  //     }
-  //   } catch (err) {
-  //     console.error(
-  //       "Existing taxi check error:",
-  //       err.response?.data || err
-  //     );
-  //   }
-  // };
   const checkExistingTaxi = async (
     paletNumberValue = form.paletNumber,
     provinceCityIdValue = form.provincesAndCitiesId
@@ -1005,7 +971,32 @@ export default function ReportPage() {
   const isMosna =
     selectedStatus?.name?.trim() ===
     "مثنی";
+  ////for popup start
+  const viewVehicleHistory = async (report) => {
+    setSelectedVehicle(report);
+    setShowHistory(true);
+    setVehicleHistory([]);
+    setHistoryError("");
+    setHistoryLoading(true);
+    try {
+      const res = await api.get(`${API_URL}/history`, {
+        params: {
+          paletNumber: report.paletNumber,
+          provincesAndCitiesId: report.provincesAndCitiesId,
+          vehicleId: report.vehicleId,
+        },
+      });
+      setVehicleHistory(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      console.error("Vehicle history error:", error.response?.data || error);
+      setHistoryError(error.response?.data?.message || "Failed to load vehicle history.");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
 
+
+  ///end popup
   return (
     <div
       dir="rtl"
@@ -1691,124 +1682,34 @@ export default function ReportPage() {
           >
             <thead
               style={{
-                backgroundColor:
-                  COLORS.brown,
-                color:
-                  COLORS.light,
+                backgroundColor: COLORS.dark,
               }}
             >
               <tr>
-                <th
-                  className="text-end"
-                  style={{
-                    border:
-                      "none",
-                    color:
-                      COLORS.light,
-                    whiteSpace:
-                      "nowrap",
-                  }}
-                >
-                  شمېره
-                </th>
-
-                <th
-                  className="text-end"
-                  style={{
-                    border:
-                      "none",
-                    color:
-                      COLORS.light,
-                    whiteSpace:
-                      "nowrap",
-                  }}
-                >
-                  نېټه
-                </th>
-
-                <th
-                  className="text-end"
-                  style={{
-                    border:
-                      "none",
-                    color:
-                      COLORS.light,
-                    whiteSpace:
-                      "nowrap",
-                  }}
-                >
-                  شرکت
-                </th>
-
-                <th
-                  className="text-end"
-                  style={{
-                    border:
-                      "none",
-                    color:
-                      COLORS.light,
-                    whiteSpace:
-                      "nowrap",
-                  }}
-                >
-                  GPS شرکت
-                </th>
-
-                <th
-                  className="text-end"
-                  style={{
-                    border:
-                      "none",
-                    color:
-                      COLORS.light,
-                    whiteSpace:
-                      "nowrap",
-                  }}
-                >
-                  سریال نمبرک کتابچه
-                </th>
-
-                <th
-                  className="text-end"
-                  style={{
-                    border:
-                      "none",
-                    color:
-                      COLORS.light,
-                    whiteSpace:
-                      "nowrap",
-                  }}
-                >
-                  پلیت نمبر
-                </th>
-
-                <th
-                  className="text-end"
-                  style={{
-                    border:
-                      "none",
-                    color:
-                      COLORS.light,
-                    whiteSpace:
-                      "nowrap",
-                  }}
-                >
-                  ولایت پلیت
-                </th>
-
-                <th
-                  className="text-end"
-                  style={{
-                    border:
-                      "none",
-                    color:
-                      COLORS.light,
-                    whiteSpace:
-                      "nowrap",
-                  }}
-                >
-                  کړنې
-                </th>
+                {[
+                  "شمېره",
+                  "نېټه",
+                  "شرکت",
+                  "GPS",
+                  "سریال نمبرکتابچه",
+                  "پلیت نمبر",
+                  "ولایت پلیت",
+                  "کړنې",
+                ].map((heading) => (
+                  <th
+                    key={heading}
+                    className="text-end"
+                    style={{
+                      backgroundColor: COLORS.dark,
+                      color: COLORS.light,
+                      border: "none",
+                      whiteSpace: "nowrap",
+                      padding: "12px",
+                    }}
+                  >
+                    {heading}
+                  </th>
+                ))}
               </tr>
             </thead>
 
@@ -2033,7 +1934,18 @@ export default function ReportPage() {
                               حذف
                             </button>
                           )}
-
+                          <button
+                            type="button"
+                            onClick={() => viewVehicleHistory(r)}
+                            style={{
+                              ...smallButtonStyle,
+                              backgroundColor: COLORS.brown,
+                              color: COLORS.light,
+                              border: `1px solid ${COLORS.brown}`,
+                            }}
+                          >
+                            د شرکتونو تاریخچه
+                          </button>
                           {isSimpleUser &&
                             !isOwner && (
                               <span
@@ -2074,6 +1986,473 @@ export default function ReportPage() {
           </table>
         </div>
       </div>
+
+
+      {/* {showHistory && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 10000,
+      backgroundColor: "rgba(0,0,0,0.65)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "15px",
+      direction: "rtl",
+    }}
+    onClick={() => setShowHistory(false)}
+  >
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="د شرکتونو تاریخچه"
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        width: "100%",
+        maxWidth: "850px",
+        maxHeight: "85vh",
+        overflow: "auto",
+        backgroundColor: COLORS.light,
+        color: COLORS.dark,
+        border: "none",
+        borderRadius: "8px",
+        boxShadow: "0 10px 35px rgba(0,0,0,0.35)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "15px",
+          backgroundColor: COLORS.dark,
+          color: COLORS.light,
+        }}
+      >
+        <div>
+          <h5 style={{ margin: 0, fontWeight: "bold" }}>
+            د پخوانیو شرکتونو تاریخچه
+          </h5>
+          <small>
+            پلیت نمبر: {selectedVehicle?.paletNumber || "-"}
+          </small>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowHistory(false)}
+          aria-label="Close"
+          style={{
+            backgroundColor: COLORS.brown,
+            color: COLORS.light,
+            border: "none",
+            borderRadius: "5px",
+            padding: "5px 12px",
+            fontWeight: "bold",
+          }}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div style={{ padding: "15px" }}>
+        {historyLoading ? (
+          <p style={{ textAlign: "center", padding: "20px" }}>
+            تاریخچه راوړل کېږي...
+          </p>
+        ) : historyError ? (
+          <div
+            role="alert"
+            style={{
+              padding: "12px",
+              backgroundColor: COLORS.brown,
+              color: COLORS.light,
+              borderRadius: "5px",
+            }}
+          >
+            {historyError}
+          </div>
+        ) : vehicleHistory.length === 0 ? (
+          <p style={{ textAlign: "center", padding: "20px" }}>
+            د دې موټر لپاره پخوانی شرکت نه دی ثبت شوی.
+          </p>
+        ) : (
+          <div style={{ overflowX: "auto" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                border: "none",
+                color: COLORS.dark,
+                backgroundColor: COLORS.light,
+                textAlign: "right",
+              }}
+            >
+              <thead>
+                <tr
+                  style={{
+                    backgroundColor: COLORS.brown,
+                    color: COLORS.light,
+                  }}
+                >
+                  <th style={{ padding: "10px", border: "none" }}>
+                    شمېره
+                  </th>
+                  <th style={{ padding: "10px", border: "none" }}>
+                    شرکت
+                  </th>
+
+                  <th style={{ padding: "10px", border: "none" }}>
+                    د انتقال نېټه
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {vehicleHistory.map((h, index) => (
+                  <tr
+                    key={h.id}
+                    style={{
+                      backgroundColor: COLORS.light,
+                      color: COLORS.dark,
+                    }}
+                  >
+                    <td style={{ padding: "10px", border: "none" }}>
+                      {index + 1}
+                    </td>
+                    <td style={{ padding: "10px", border: "none" }}>
+                      {h.companyName || `Company ID: ${h.companyId}`}
+                    </td>
+
+                    <td
+                      style={{
+                        padding: "10px",
+                        border: "none",
+                        direction: "ltr",
+                        textAlign: "right",
+                      }}
+                    >
+                      {h.transferDate
+                        ? new Date(h.transferDate).toLocaleString()
+                        : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <div
+        style={{
+          padding: "12px 15px",
+          display: "flex",
+          justifyContent: "flex-start",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setShowHistory(false)}
+          style={{
+            ...smallButtonStyle,
+            backgroundColor: COLORS.dark,
+            color: COLORS.light,
+            border: "none",
+          }}
+        >
+          بندول
+        </button>
+      </div>
+    </div>
+  </div>
+)} */}
+      {showHistory && (
+        <div
+          className="history-overlay"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 10000,
+            backgroundColor: "rgba(0, 0, 0, 0.62)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "15px",
+            direction: "rtl",
+          }}
+          onClick={() => setShowHistory(false)}
+        >
+          <div
+            className="history-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="د شرکتونو تاریخچه"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: "850px",
+              maxHeight: "85vh",
+              overflowY: "auto",
+              overflowX: "hidden",
+              backgroundColor: COLORS.light,
+              color: COLORS.dark,
+              border: "none",
+              borderRadius: "12px",
+              boxShadow: "0 16px 45px rgba(0, 0, 0, 0.28)",
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+                padding: "16px 20px",
+                backgroundColor: COLORS.dark,
+                color: COLORS.light,
+                borderRadius: "12px 12px 0 0",
+              }}
+            >
+              <div>
+                <h5
+                  style={{
+                    margin: 0,
+                    fontWeight: "bold",
+                    fontSize: "18px",
+                  }}
+                >
+                  د پخوانیو شرکتونو تاریخچه
+                </h5>
+
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "6px",
+                    opacity: 0.85,
+                  }}
+                >
+                  پلیت نمبر: {selectedVehicle?.paletNumber || "-"}
+                </small>
+              </div>
+
+              <button
+                type="button"
+                className="history-close"
+                onClick={() => setShowHistory(false)}
+                aria-label="Close"
+                style={{
+                  flexShrink: 0,
+                  backgroundColor: COLORS.brown,
+                  color: COLORS.light,
+                  border: "none",
+                  borderRadius: "7px",
+                  width: "36px",
+                  height: "36px",
+                  fontSize: "18px",
+                  fontWeight: "bold",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: "20px" }}>
+              {historyLoading ? (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "35px 15px",
+                    color: COLORS.dark,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      border: `3px solid ${COLORS.light}`,
+                      borderTop: `3px solid ${COLORS.brown}`,
+                      borderRadius: "50%",
+                      animation: "historySpin 0.8s linear infinite",
+                      margin: "0 auto 12px",
+                    }}
+                  />
+
+                  <p style={{ margin: 0 }}>
+                    تاریخچه راوړل کېږي...
+                  </p>
+                </div>
+              ) : historyError ? (
+                <div
+                  role="alert"
+                  style={{
+                    padding: "14px",
+                    backgroundColor: COLORS.brown,
+                    color: COLORS.light,
+                    borderRadius: "8px",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {historyError}
+                </div>
+              ) : vehicleHistory.length === 0 ? (
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "35px 15px",
+                    color: COLORS.dark,
+                  }}
+                >
+                  <div style={{ fontSize: "32px", marginBottom: "10px" }}>
+                    📋
+                  </div>
+
+                  <p style={{ margin: 0 }}>
+                    د دې موټر لپاره پخوانی شرکت نه دی ثبت شوی.
+                  </p>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    overflowX: "auto",
+                    borderRadius: "8px",
+                    boxShadow: "0 3px 12px rgba(52, 49, 72, 0.08)",
+                  }}
+                >
+                  <table
+                    className="history-table"
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      border: "none",
+                      color: COLORS.dark,
+                      backgroundColor: COLORS.light,
+                      textAlign: "right",
+                    }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          backgroundColor: COLORS.brown,
+                          color: COLORS.light,
+                        }}
+                      >
+                        <th
+                          style={{
+                            padding: "13px 14px",
+                            border: "none",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          شمېره
+                        </th>
+
+                        <th
+                          style={{
+                            padding: "13px 14px",
+                            border: "none",
+                          }}
+                        >
+                          شرکت
+                        </th>
+
+                        <th
+                          style={{
+                            padding: "13px 14px",
+                            border: "none",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          د انتقال نېټه
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {vehicleHistory.map((h, index) => (
+                        <tr
+                          key={h.id}
+                          style={{
+                            backgroundColor: COLORS.light,
+                            color: COLORS.dark,
+                          }}
+                        >
+                          <td
+                            style={{
+                              padding: "12px 14px",
+                              border: "none",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {index + 1}
+                          </td>
+
+                          <td
+                            style={{
+                              padding: "12px 14px",
+                              border: "none",
+                              fontWeight: 500,
+                            }}
+                          >
+                            {h.companyName || `Company ID: ${h.companyId}`}
+                          </td>
+
+                          <td
+                            style={{
+                              padding: "12px 14px",
+                              border: "none",
+                              direction: "ltr",
+                              textAlign: "right",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {h.transferDate
+                              ? new Date(h.transferDate).toLocaleString()
+                              : "-"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                padding: "0 20px 18px",
+                display: "flex",
+                justifyContent: "flex-start",
+              }}
+            >
+              <button
+                type="button"
+                className="history-footer-button"
+                onClick={() => setShowHistory(false)}
+                style={{
+                  ...smallButtonStyle,
+                  backgroundColor: COLORS.dark,
+                  color: COLORS.light,
+                  border: "none",
+                  borderRadius: "7px",
+                  padding: "9px 20px",
+                  fontWeight: "bold",
+                }}
+              >
+                بندول
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

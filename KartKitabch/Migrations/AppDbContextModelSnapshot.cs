@@ -398,6 +398,34 @@ namespace KartKitabch.Migrations
                     b.ToTable("Senders");
                 });
 
+            modelBuilder.Entity("KartKitabch.Models.VehicleCompanyHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PaletNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProvincesAndCitiesId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransferDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VehicleCompanyHistories");
+                });
+
             modelBuilder.Entity("KartKitabch.Models.vehicle", b =>
                 {
                     b.Property<int>("Id")

@@ -9,12 +9,32 @@ END;
 GO
 
 BEGIN TRANSACTION;
+CREATE TABLE [AspNetRoles] (
+    [Id] nvarchar(450) NOT NULL,
+    [Name] nvarchar(256) NULL,
+    [NormalizedName] nvarchar(256) NULL,
+    [ConcurrencyStamp] nvarchar(max) NULL,
+    CONSTRAINT [PK_AspNetRoles] PRIMARY KEY ([Id])
+);
+
 CREATE TABLE [Companies] (
     [Id] int NOT NULL IDENTITY,
     [Name] nvarchar(max) NOT NULL,
     [MyProperty] int NOT NULL,
     [CompanyTon] int NOT NULL,
+    [CompanyPlace] int NOT NULL,
+    [CompanyCategory] int NOT NULL,
+    [ExtraReportBatches] int NOT NULL,
+    [IsAddingClosed] bit NOT NULL,
+    [AutoCloseEnabled] bit NOT NULL,
+    [OldRecordCount] int NULL,
     CONSTRAINT [PK_Companies] PRIMARY KEY ([Id])
+);
+
+CREATE TABLE [GPSCompanies] (
+    [Id] int NOT NULL IDENTITY,
+    [Name] nvarchar(max) NOT NULL,
+    CONSTRAINT [PK_GPSCompanies] PRIMARY KEY ([Id])
 );
 
 CREATE TABLE [OfficeContents] (
@@ -52,10 +72,47 @@ CREATE TABLE [Vehicles] (
     CONSTRAINT [PK_Vehicles] PRIMARY KEY ([Id])
 );
 
+CREATE TABLE [AspNetRoleClaims] (
+    [Id] int NOT NULL IDENTITY,
+    [RoleId] nvarchar(450) NOT NULL,
+    [ClaimType] nvarchar(max) NULL,
+    [ClaimValue] nvarchar(max) NULL,
+    CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id]) ON DELETE CASCADE
+);
+
+CREATE TABLE [AspNetUsers] (
+    [Id] nvarchar(450) NOT NULL,
+    [FullName] nvarchar(max) NULL,
+    [CompanyId] int NULL,
+    [IsActive] bit NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    [UserName] nvarchar(256) NULL,
+    [NormalizedUserName] nvarchar(256) NULL,
+    [Email] nvarchar(256) NULL,
+    [NormalizedEmail] nvarchar(256) NULL,
+    [EmailConfirmed] bit NOT NULL,
+    [PasswordHash] nvarchar(max) NULL,
+    [SecurityStamp] nvarchar(max) NULL,
+    [ConcurrencyStamp] nvarchar(max) NULL,
+    [PhoneNumber] nvarchar(max) NULL,
+    [PhoneNumberConfirmed] bit NOT NULL,
+    [TwoFactorEnabled] bit NOT NULL,
+    [LockoutEnd] datetimeoffset NULL,
+    [LockoutEnabled] bit NOT NULL,
+    [AccessFailedCount] int NOT NULL,
+    CONSTRAINT [PK_AspNetUsers] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_AspNetUsers_Companies_CompanyId] FOREIGN KEY ([CompanyId]) REFERENCES [Companies] ([Id]) ON DELETE SET NULL
+);
+
 CREATE TABLE [CompanyLocations] (
     [Id] int NOT NULL IDENTITY,
     [CompanyId] int NOT NULL,
     [ProvincesAndCitiesId] int NOT NULL,
+    [OldLocationRecordCount] int NULL,
+    [ExtraReportBatches] int NOT NULL,
+    [IsAddingClosed] bit NOT NULL,
+    [AutoCloseEnabled] bit NOT NULL,
     CONSTRAINT [PK_CompanyLocations] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_CompanyLocations_Companies_CompanyId] FOREIGN KEY ([CompanyId]) REFERENCES [Companies] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_CompanyLocations_ProvincesAndCities_ProvincesAndCitiesId] FOREIGN KEY ([ProvincesAndCitiesId]) REFERENCES [ProvincesAndCities] ([Id]) ON DELETE CASCADE
@@ -93,107 +150,17 @@ CREATE TABLE [Report] (
     [TypeOfActivity] int NULL,
     [KartNewRenewLost] int NULL,
     [VehicleId] int NOT NULL,
+    [GPSCompanyId] int NULL,
     [DateS] nvarchar(max) NOT NULL,
     [Chasis] nvarchar(max) NULL,
+    [LostPrice] int NULL,
     CONSTRAINT [PK_Report] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Report_Companies_CompanyId] FOREIGN KEY ([CompanyId]) REFERENCES [Companies] ([Id]) ON DELETE NO ACTION,
     CONSTRAINT [FK_Report_Companies_DestinationCompanyId] FOREIGN KEY ([DestinationCompanyId]) REFERENCES [Companies] ([Id]) ON DELETE NO ACTION,
+    CONSTRAINT [FK_Report_GPSCompanies_GPSCompanyId] FOREIGN KEY ([GPSCompanyId]) REFERENCES [GPSCompanies] ([Id]) ON DELETE SET NULL,
     CONSTRAINT [FK_Report_ProvincesAndCities_DestinationProvinceId] FOREIGN KEY ([DestinationProvinceId]) REFERENCES [ProvincesAndCities] ([Id]) ON DELETE NO ACTION,
     CONSTRAINT [FK_Report_ProvincesAndCities_ProvincesAndCitiesId] FOREIGN KEY ([ProvincesAndCitiesId]) REFERENCES [ProvincesAndCities] ([Id]) ON DELETE NO ACTION,
     CONSTRAINT [FK_Report_Vehicles_VehicleId] FOREIGN KEY ([VehicleId]) REFERENCES [Vehicles] ([Id]) ON DELETE CASCADE
-);
-
-CREATE INDEX [IX_CompanyLocations_CompanyId] ON [CompanyLocations] ([CompanyId]);
-
-CREATE INDEX [IX_CompanyLocations_ProvincesAndCitiesId] ON [CompanyLocations] ([ProvincesAndCitiesId]);
-
-CREATE INDEX [IX_Letters_OfficeContentId] ON [Letters] ([OfficeContentId]);
-
-CREATE INDEX [IX_Letters_PersonId] ON [Letters] ([PersonId]);
-
-CREATE INDEX [IX_Letters_ProvincesAndCitiesId] ON [Letters] ([ProvincesAndCitiesId]);
-
-CREATE INDEX [IX_Letters_SenderId] ON [Letters] ([SenderId]);
-
-CREATE INDEX [IX_Letters_VehicleId] ON [Letters] ([VehicleId]);
-
-CREATE INDEX [IX_Report_CompanyId] ON [Report] ([CompanyId]);
-
-CREATE INDEX [IX_Report_DestinationCompanyId] ON [Report] ([DestinationCompanyId]);
-
-CREATE INDEX [IX_Report_DestinationProvinceId] ON [Report] ([DestinationProvinceId]);
-
-CREATE INDEX [IX_Report_ProvincesAndCitiesId] ON [Report] ([ProvincesAndCitiesId]);
-
-CREATE INDEX [IX_Report_VehicleId] ON [Report] ([VehicleId]);
-
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20260801151604_AddSenderWithValidateNverd', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-ALTER TABLE [Report] ADD [GPSCompanyId] int NULL;
-
-CREATE TABLE [GPSCompanies] (
-    [Id] int NOT NULL IDENTITY,
-    [Name] nvarchar(max) NOT NULL,
-    CONSTRAINT [PK_GPSCompanies] PRIMARY KEY ([Id])
-);
-
-CREATE INDEX [IX_Report_GPSCompanyId] ON [Report] ([GPSCompanyId]);
-
-ALTER TABLE [Report] ADD CONSTRAINT [FK_Report_GPSCompanies_GPSCompanyId] FOREIGN KEY ([GPSCompanyId]) REFERENCES [GPSCompanies] ([Id]);
-
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261002092121_AddGps', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-ALTER TABLE [Report] DROP CONSTRAINT [FK_Report_GPSCompanies_GPSCompanyId];
-
-CREATE TABLE [AspNetRoles] (
-    [Id] nvarchar(450) NOT NULL,
-    [Name] nvarchar(256) NULL,
-    [NormalizedName] nvarchar(256) NULL,
-    [ConcurrencyStamp] nvarchar(max) NULL,
-    CONSTRAINT [PK_AspNetRoles] PRIMARY KEY ([Id])
-);
-
-CREATE TABLE [AspNetUsers] (
-    [Id] nvarchar(450) NOT NULL,
-    [FullName] nvarchar(max) NULL,
-    [CompanyId] int NULL,
-    [IsActive] bit NOT NULL,
-    [CreatedAt] datetime2 NOT NULL,
-    [UserName] nvarchar(256) NULL,
-    [NormalizedUserName] nvarchar(256) NULL,
-    [Email] nvarchar(256) NULL,
-    [NormalizedEmail] nvarchar(256) NULL,
-    [EmailConfirmed] bit NOT NULL,
-    [PasswordHash] nvarchar(max) NULL,
-    [SecurityStamp] nvarchar(max) NULL,
-    [ConcurrencyStamp] nvarchar(max) NULL,
-    [PhoneNumber] nvarchar(max) NULL,
-    [PhoneNumberConfirmed] bit NOT NULL,
-    [TwoFactorEnabled] bit NOT NULL,
-    [LockoutEnd] datetimeoffset NULL,
-    [LockoutEnabled] bit NOT NULL,
-    [AccessFailedCount] int NOT NULL,
-    CONSTRAINT [PK_AspNetUsers] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_AspNetUsers_Companies_CompanyId] FOREIGN KEY ([CompanyId]) REFERENCES [Companies] ([Id]) ON DELETE SET NULL
-);
-
-CREATE TABLE [AspNetRoleClaims] (
-    [Id] int NOT NULL IDENTITY,
-    [RoleId] nvarchar(450) NOT NULL,
-    [ClaimType] nvarchar(max) NULL,
-    [ClaimValue] nvarchar(max) NULL,
-    CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id]) ON DELETE CASCADE
 );
 
 CREATE TABLE [AspNetUserClaims] (
@@ -247,89 +214,58 @@ CREATE INDEX [IX_AspNetUsers_CompanyId] ON [AspNetUsers] ([CompanyId]);
 
 CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName]) WHERE [NormalizedUserName] IS NOT NULL;
 
-ALTER TABLE [Report] ADD CONSTRAINT [FK_Report_GPSCompanies_GPSCompanyId] FOREIGN KEY ([GPSCompanyId]) REFERENCES [GPSCompanies] ([Id]) ON DELETE SET NULL;
+CREATE INDEX [IX_CompanyLocations_CompanyId] ON [CompanyLocations] ([CompanyId]);
+
+CREATE INDEX [IX_CompanyLocations_ProvincesAndCitiesId] ON [CompanyLocations] ([ProvincesAndCitiesId]);
+
+CREATE INDEX [IX_Letters_OfficeContentId] ON [Letters] ([OfficeContentId]);
+
+CREATE INDEX [IX_Letters_PersonId] ON [Letters] ([PersonId]);
+
+CREATE INDEX [IX_Letters_ProvincesAndCitiesId] ON [Letters] ([ProvincesAndCitiesId]);
+
+CREATE INDEX [IX_Letters_SenderId] ON [Letters] ([SenderId]);
+
+CREATE INDEX [IX_Letters_VehicleId] ON [Letters] ([VehicleId]);
+
+CREATE INDEX [IX_Report_CompanyId] ON [Report] ([CompanyId]);
+
+CREATE INDEX [IX_Report_DestinationCompanyId] ON [Report] ([DestinationCompanyId]);
+
+CREATE INDEX [IX_Report_DestinationProvinceId] ON [Report] ([DestinationProvinceId]);
+
+CREATE INDEX [IX_Report_GPSCompanyId] ON [Report] ([GPSCompanyId]);
+
+CREATE INDEX [IX_Report_ProvincesAndCitiesId] ON [Report] ([ProvincesAndCitiesId]);
+
+CREATE INDEX [IX_Report_VehicleId] ON [Report] ([VehicleId]);
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261002141013_AddUsers', N'10.0.12');
+VALUES (N'20261009132734_KartDb', N'10.0.12');
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+CREATE TABLE [VehicleCompanyHistories] (
+    [Id] int NOT NULL IDENTITY,
+    [PaletNumber] nvarchar(max) NULL,
+    [ProvincesAndCitiesId] int NULL,
+    [VehicleId] int NOT NULL,
+    [CompanyId] int NOT NULL,
+    [TransferDate] datetime2 NOT NULL,
+    CONSTRAINT [PK_VehicleCompanyHistories] PRIMARY KEY ([Id])
+);
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261009143132_AddVehicleCompanyHistory', N'10.0.12');
 
 COMMIT;
 GO
 
 BEGIN TRANSACTION;
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261006014536_InitialCreate', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261006020206_InitialCreate1', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-ALTER TABLE [Companies] ADD [CompanyPlace] int NOT NULL DEFAULT 0;
-
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261006174014_sfffg', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261006175349_sfffgd', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-ALTER TABLE [Companies] ADD [CompanyCategory] int NOT NULL DEFAULT 0;
-
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261006175611_sfffgdf', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-ALTER TABLE [Companies] ADD [AutoCloseEnabled] bit NOT NULL DEFAULT CAST(0 AS bit);
-
-ALTER TABLE [Companies] ADD [ExtraReportBatches] int NOT NULL DEFAULT 0;
-
-ALTER TABLE [Companies] ADD [IsAddingClosed] bit NOT NULL DEFAULT CAST(0 AS bit);
-
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261007040322_AddReportControlToCompany', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-ALTER TABLE [CompanyLocations] ADD [AutoCloseEnabled] bit NOT NULL DEFAULT CAST(0 AS bit);
-
-ALTER TABLE [CompanyLocations] ADD [ExtraReportBatches] int NOT NULL DEFAULT 0;
-
-ALTER TABLE [CompanyLocations] ADD [IsAddingClosed] bit NOT NULL DEFAULT CAST(0 AS bit);
-
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261007072756_AddCompanyLocationBatchControl', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261007113535_InitialCreatedd', N'10.0.12');
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20261007113848_InitialCreateddd', N'10.0.12');
+VALUES (N'20261009143601_AddVehicleCompanyHistoryg', N'10.0.12');
 
 COMMIT;
 GO

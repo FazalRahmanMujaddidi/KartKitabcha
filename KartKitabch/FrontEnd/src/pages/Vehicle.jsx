@@ -387,13 +387,15 @@ export default function VehiclePage() {
               <thead>
                 <tr
                   style={{
-                    backgroundColor: COLORS.dark,
+                    backgroundColor: COLORS.brown,
                   }}
                 >
                   <th
                     style={{
+                      backgroundColor: COLORS.brown,
                       color: COLORS.light,
                       textAlign: "right",
+                      border: "none",
                     }}
                   >
                     شمېره
@@ -401,8 +403,10 @@ export default function VehiclePage() {
 
                   <th
                     style={{
+                      backgroundColor: COLORS.brown,
                       color: COLORS.light,
                       textAlign: "right",
+                      border: "none",
                     }}
                   >
                     د وسیلې ډول
@@ -412,9 +416,11 @@ export default function VehiclePage() {
                   {(canEdit || canDelete) && (
                     <th
                       style={{
+                        backgroundColor: COLORS.brown,
                         color: COLORS.light,
                         textAlign: "right",
                         width: "180px",
+                        border: "none",
                       }}
                     >
                       کړنې
